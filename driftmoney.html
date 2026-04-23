@@ -215,6 +215,8 @@
             const [editingTransaction, setEditingTransaction] = useState(null);
             const [editingTemplate, setEditingTemplate] = useState(null);
             const [isDemo, setIsDemo] = useState(true);
+            const [balanceFocused, setBalanceFocused] = useState(false);
+            const [balanceRawInput, setBalanceRawInput] = useState('');
             const [showAbout, setShowAbout] = useState(false);
 
             const USER_KEY = 'driftmoney_userdata';
@@ -897,7 +899,7 @@
                                     <span className="text-slate-600 text-sm">Starting Balance</span>
                                     <DollarSign />
                                 </div>
-                                <input type="number" value={activeStartingBalance.toFixed(2)} onChange={(e) => { if (!isDemo) setStartingBalance(parseFloat(e.target.value) || 0); }} readOnly={isDemo} className={'text-2xl font-bold text-slate-800 w-full border-b-2 focus:outline-none ' + (isDemo ? 'border-slate-300 text-slate-400 cursor-not-allowed' : 'border-blue-500')} placeholder="0.00" />
+                                <input type="text" inputMode="decimal" value={balanceFocused ? balanceRawInput : activeStartingBalance.toFixed(2)} onFocus={() => { setBalanceFocused(true); setBalanceRawInput(String(activeStartingBalance)); }} onBlur={() => { setBalanceFocused(false); if (!isDemo) setStartingBalance(parseFloat(balanceRawInput) || 0); }} onChange={(e) => { if (!isDemo) setBalanceRawInput(e.target.value); }} readOnly={isDemo} className={'text-2xl font-bold text-slate-800 w-full border-b-2 focus:outline-none ' + (isDemo ? 'border-slate-300 text-slate-400 cursor-not-allowed' : 'border-blue-500')} placeholder="0.00" />
                             </div>
 
                             <div className="bg-white rounded-lg shadow p-5">
