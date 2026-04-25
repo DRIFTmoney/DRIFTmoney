@@ -14,6 +14,31 @@
     <div id="root"></div>
 
     <script type="text/babel">
+        /*
+         * DRIFTmoney — Cash Flow Forecasting Tool
+         * https://driftmoney.app
+         *
+         * Architecture:
+         *   - Single HTML file. No build step, no server, no backend.
+         *   - React 18 loaded from CDN via Babel standalone (JSX in-browser transpilation).
+         *   - All styling via Tailwind CSS (CDN).
+         *   - All data stored in browser localStorage. Nothing is transmitted anywhere.
+         *   - Two modes: Demo (hardcoded sample data, read-only) and My Data (user's own data).
+         *
+         * Key data structures:
+         *   - recurringTemplates: bills/income that repeat on a schedule (days, weeks, months, or monthDay)
+         *   - transactions: one-time events (past or future)
+         *   - balanceOverrides: manual corrections to the running balance on a specific date
+         *   - startingBalance: the user's known account balance as of a reference date
+         *
+         * Forecast engine (generateForecast):
+         *   Walks forward day-by-day from today, applying recurring transactions and one-time
+         *   events, and recalculates the running balance. Balance overrides reset the running
+         *   total on their date. Output is a flat array of dated events displayed in the timeline.
+         *
+         * To audit data privacy: search for "localStorage" — that is the only place data is written.
+         * There are no fetch() calls, no analytics, no tracking of any kind.
+         */
         const { useState, useEffect } = React;
         
         const Plus = () => (
@@ -792,7 +817,7 @@
                             <div className="bg-white rounded-xl shadow p-8 mb-6">
                                 <h2 className="text-xl font-bold text-slate-800 mb-4">Open &amp; Transparent</h2>
                                 <p className="text-slate-700 leading-relaxed mb-3">DRIFTmoney is a single HTML file — there's nothing hidden. You can open it in any text editor and read exactly how it works. It's published on GitHub under the MIT License, which means you're free to use it, modify it, and share it.</p>
-                                <p className="text-slate-500 text-sm">GitHub link coming soon.</p>
+                                <a href="https://github.com/DRIFTmoney/DRIFTmoney" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 text-sm underline">View source on GitHub</a>
                             </div>
 
                             <div className="text-center text-slate-400 text-sm pb-8">
