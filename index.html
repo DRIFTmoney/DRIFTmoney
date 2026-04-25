@@ -742,6 +742,19 @@
                 }
                 return 'Every ' + template.intervalValue + ' ' + template.intervalType;
             };
+
+            // Index of the most recent non-future transaction in filteredData
+            const lastPastIndex = (() => {
+                const source = filterCutoff ? filteredData : balanceData;
+                let idx = -1;
+                source.forEach((item, i) => {
+                    if (parseLocalDate(item.date) <= today) idx = i;
+                });
+                return idx;
+            })();
+
+            // Current month key e.g. "2026-04"
+            const currentMonthKey = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
             
             const getTransactionColor = (item) => {
                 if (item.isOverride) return 'bg-yellow-50 border-yellow-500';
@@ -1224,7 +1237,7 @@
                                         <div className="space-y-2">
                                             {balanceHeader}
                                             {monthlyData.map(row => (
-                                                <div key={row.key} className={'p-3 rounded-lg border-l-4 ' + (row.net >= 0 ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500')}>
+                                                <div key={row.key} className={'p-3 rounded-lg border-l-4 ' + (row.net >= 0 ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500') + (row.key === currentMonthKey ? ' ring-4 ring-blue-500' : '')}>
                                                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                                                         <div className="font-semibold text-slate-800 text-base">{row.label}</div>
                                                         <div className="flex items-center justify-end gap-4 ml-auto">
@@ -1259,7 +1272,7 @@
                                 return (
                                     <div className="space-y-2">
                                         {balanceHeader}
-                                        {filteredData.map((item) => (
+                                        {filteredData.map((item, idx) => (
                                             <div key={item.id}>
                                             {editingTransaction && editingTransaction.id === item.id ? (
                                                 <div className={'p-3 rounded-lg border-l-4 border-blue-500 bg-blue-50'}>
@@ -1299,7 +1312,7 @@
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className={'p-3 rounded-lg border-l-4 ' + getTransactionColor(item) + (item.isRecurring ? ' opacity-75' : '')}>
+                                                <div className={'p-3 rounded-lg border-l-4 ' + getTransactionColor(item) + (item.isRecurring ? ' opacity-75' : '') + (idx === lastPastIndex ? ' ring-4 ring-blue-500' : '')}>
                                                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                                                         <div className="flex items-center gap-3 flex-wrap">
                                                             <div className="text-sm text-slate-600 font-medium">
