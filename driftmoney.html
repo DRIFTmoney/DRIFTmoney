@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRIFTmoney</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMjEwLjA3ODcgMjMxLjExNTg4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgZ3JhZGllbnRUcmFuc2Zvcm09InJvdGF0ZSgyNSkiIGlkPSJmZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDBBNjgiIHN0b3Atb3BhY2l0eT0iMSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwQzRFRSIgc3RvcC1vcGFjaXR5PSIxIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgeGxpbms6aHJlZj0iI2ZnIiBpZD0iZmwiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0ic2NhbGUoMS4yMzM4MDQxLDAuODEwNTAxNDUpIiB4MT0iNC4wNTI1MDc0IiB5MT0iMjUuMjE3NjQiIHgyPSI3Ni45OTc2MzUiIHkyPSIyNS4yMTc2NCIvPjxjbGlwUGF0aCBpZD0iZmMiPjxyZWN0IHdpZHRoPSIyMTAuMDc4NyIgaGVpZ2h0PSIyMzEuMTE1ODgiIHJ4PSI0MCIvPjwvY2xpcFBhdGg+PC9kZWZzPjxyZWN0IHdpZHRoPSIyMTAuMDc4NyIgaGVpZ2h0PSIyMzEuMTE1ODgiIHJ4PSI0MCIgZmlsbD0iI2QyZWFmNSIvPjxnIGNsaXAtcGF0aD0idXJsKCNmYykiPjxnIHRyYW5zZm9ybT0ibWF0cml4KDIuMTExMTExLDAsMCwyLjExMTExMSwtMC41NTU1NTYsMTAuMDAyMzg0KSIgc3Ryb2tlPSJub25lIiBzdHlsZT0iZmlsbDp1cmwoI2ZsKSI+PHBhdGggZD0iTSA1LDI1IFYgMzUgQyAzNSw1MC44IDY1LDE5LjIgOTUsMzUgViAyNSBDIDY1LDkuMiAzNSw0MC44IDUsMjUgTSA1LDU1IEMgMzUsNzAuOCA2NSwzOS4yIDk1LDU1IFYgNDUgQyA2NSwyOS4yIDM1LDYwLjggNSw0NSBaIE0gNSw3NSBDIDM1LDkwLjggNjUsNTkuMiA5NSw3NSBWIDY1IEMgNjUsNDkuMiAzNSw4MC44IDUsNjUgWiIvPjwvZz48L2c+PC9zdmc+">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Plus = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        );
+        
+        const Trash2 = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+        );
+        
+        const TrendingDown = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                <polyline points="17 18 23 18 23 12"></polyline>
+            </svg>
+        );
+        
+        const TrendingUp = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+        );
+        
+        const DollarSign = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+        );
+        
+        const Download = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        );
+        
+        const Upload = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+        );
+        
+        const RotateCcw = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+        );
+
+        const Repeat = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="17 1 21 5 17 9"></polyline>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <polyline points="7 23 3 19 7 15"></polyline>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+        );
+
+        const Calendar = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+        );
+
+        const Edit = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+        );
+
+        const Save = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+        );
+
+        const X = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        );
+
+        const ChevronDown = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        );
+
+        const ChevronUp = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+        );
+
+        // Helper function to parse date string as local date (avoiding UTC timezone issues)
+        const parseLocalDate = (dateString) => {
+            const [year, month, day] = dateString.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        };
+
+        const DEMO_DATA = {
+            startingBalance: 5800,
+            transactions: [
+                { id: 'd1', name: 'New Tires', amount: 310, date: '2026-05-22', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+                { id: 'd2', name: 'Balance Check', amount: 0, date: '2026-06-01', type: 'expense', isOverride: true, overrideBalance: 4920, isRecurring: false },
+                { id: 'd3', name: 'Costco Run', amount: 194.67, date: '2026-06-19', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+                { id: 'd4', name: 'Grocery Run', amount: 87.43, date: '2026-07-11', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+                { id: 'd5', name: 'Balance Check', amount: 0, date: '2026-09-01', type: 'expense', isOverride: true, overrideBalance: 4340, isRecurring: false },
+                { id: 'd6', name: 'Costco Run', amount: 211.28, date: '2026-10-17', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+                { id: 'd7', name: 'Grocery Run', amount: 93.15, date: '2026-11-08', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+                { id: 'd8', name: 'Grocery Run', amount: 104.72, date: '2027-01-14', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+                { id: 'd9', name: 'Car Registration', amount: 187, date: '2026-08-15', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+                { id: 'd10', name: 'Costco Run', amount: 178.54, date: '2027-02-06', type: 'expense', isOverride: false, overrideBalance: null, isRecurring: false },
+            ],
+            recurringTemplates: [
+                { id: 'dt1', name: 'Paycheck', amount: 1100, startDate: '2026-04-17', endDate: '', type: 'income', intervalType: 'days', intervalValue: 14, monthDay: 1 },
+                { id: 'dt2', name: 'Rent', amount: 1450, startDate: '2026-05-01', endDate: '', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 1 },
+                { id: 'dt3', name: 'Car Payment', amount: 312, startDate: '2026-04-20', endDate: '2028-04-20', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 20 },
+                { id: 'dt4', name: 'Electric Bill', amount: 94, startDate: '2026-04-22', endDate: '', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 22 },
+                { id: 'dt5', name: 'Internet', amount: 65, startDate: '2026-04-28', endDate: '', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 28 },
+                { id: 'dt6', name: 'Phone', amount: 48, startDate: '2026-04-15', endDate: '', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 15 },
+                { id: 'dt7', name: 'Streaming Services', amount: 42, startDate: '2026-04-10', endDate: '', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 10 },
+                { id: 'dt8', name: 'Car Insurance', amount: 138, startDate: '2026-04-05', endDate: '', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 5 },
+                { id: 'dt9', name: 'Groceries', amount: 320, startDate: '2026-04-25', endDate: '', type: 'expense', intervalType: 'monthDay', intervalValue: 30, monthDay: 25 },
+                { id: 'dt10', name: 'Tax Refund', amount: 4800, startDate: '2027-03-01', endDate: '', type: 'income', intervalType: 'months', intervalValue: 12, monthDay: 1 },
+            ]
+        };
+
+        function CashFlowTracker() {
+            const [startingBalance, setStartingBalance] = useState(0);
+            const [transactions, setTransactions] = useState([]);
+            const [recurringTemplates, setRecurringTemplates] = useState([]);
+            const [newTransaction, setNewTransaction] = useState({
+                name: '',
+                amount: '',
+                date: '',
+                type: 'expense',
+                isOverride: false,
+                overrideBalance: ''
+            });
+            const [newRecurring, setNewRecurring] = useState({
+                name: '',
+                amount: '',
+                startDate: '',
+                endDate: '',
+                type: 'expense',
+                intervalType: 'days',
+                intervalValue: 30,
+                monthDay: 1
+            });
+            // Synchronous init helper — reads prefs before first render to prevent flash
+            const getInitialUiPref = (key, demoDefault, userDefault) => {
+                try {
+                    // Determine demo vs my data synchronously
+                    const oldRaw = localStorage.getItem('cashFlowData');
+                    const userRaw = localStorage.getItem('driftmoney_userdata') || oldRaw;
+                    let isMyData = false;
+                    if (userRaw) {
+                        const p = JSON.parse(userRaw);
+                        isMyData = (p.transactions && p.transactions.length > 0) ||
+                                   (p.recurringTemplates && p.recurringTemplates.length > 0) ||
+                                   (p.startingBalance && p.startingBalance !== 0);
+                    }
+                    if (!isMyData) return demoDefault;
+                    const prefsRaw = localStorage.getItem('driftmoney_uiprefs');
+                    if (!prefsRaw) return userDefault;
+                    const prefs = JSON.parse(prefsRaw);
+                    return prefs[key] !== undefined ? prefs[key] : userDefault;
+                } catch(e) { return demoDefault; }
+            };
+
+            const [forecastMonths, setForecastMonths] = useState(() => getInitialUiPref('forecastMonths', 12, 3));
+            const [showRecurring, setShowRecurring] = useState(() => getInitialUiPref('showRecurring', true, true));
+            const [showOneTime, setShowOneTime] = useState(() => getInitialUiPref('showOneTime', true, true));
+            const [hidePrevious, setHidePrevious] = useState(() => getInitialUiPref('hidePrevious', false, false));
+            const [displayStartDate, setDisplayStartDate] = useState(() => getInitialUiPref('displayStartDate', '', ''));
+            const [viewMode, setViewMode] = useState(() => getInitialUiPref('viewMode', 'detailed', 'detailed'));
+            const [showSetup, setShowSetup] = useState(() => getInitialUiPref('showSetup', true, true));
+            const [editingTransaction, setEditingTransaction] = useState(null);
+            const [editingTemplate, setEditingTemplate] = useState(null);
+            const [isDemo, setIsDemo] = useState(true);
+            const [balanceFocused, setBalanceFocused] = useState(false);
+            const [balanceRawInput, setBalanceRawInput] = useState('');
+            const [showAbout, setShowAbout] = useState(false);
+
+            const USER_KEY = 'driftmoney_userdata';
+            const UI_KEY = 'driftmoney_uiprefs';
+
+            const DEMO_UI = {
+                forecastMonths: 12,
+                showSetup: true,
+                showRecurring: true,
+                showOneTime: true,
+                viewMode: 'detailed',
+                hidePrevious: false,
+                displayStartDate: ''
+            };
+
+            const loadUserData = () => {
+                // Migrate from old key if needed
+                const oldData = localStorage.getItem('cashFlowData');
+                const newData = localStorage.getItem(USER_KEY);
+                if (oldData && !newData) {
+                    localStorage.setItem(USER_KEY, oldData);
+                    localStorage.removeItem('cashFlowData');
+                }
+                const raw = localStorage.getItem(USER_KEY);
+                if (!raw) return null;
+                try {
+                    const parsed = JSON.parse(raw);
+                    const hasData = (parsed.transactions && parsed.transactions.length > 0) ||
+                                    (parsed.recurringTemplates && parsed.recurringTemplates.length > 0) ||
+                                    (parsed.startingBalance && parsed.startingBalance !== 0);
+                    return hasData ? parsed : null;
+                } catch(e) { return null; }
+            };
+
+            const saveUserData = (bal, txns, templates) => {
+                localStorage.setItem(USER_KEY, JSON.stringify({
+                    startingBalance: bal,
+                    transactions: txns,
+                    recurringTemplates: templates,
+                    lastUpdated: new Date().toISOString()
+                }));
+            };
+
+            const loadUiPrefs = () => {
+                const raw = localStorage.getItem(UI_KEY);
+                if (!raw) return null;
+                try { return JSON.parse(raw); } catch(e) { return null; }
+            };
+
+            const saveUiPrefs = (prefs) => {
+                localStorage.setItem(UI_KEY, JSON.stringify(prefs));
+            };
+
+            const applyUiPrefs = (prefs) => {
+                if (!prefs) return;
+                if (prefs.forecastMonths !== undefined) setForecastMonths(prefs.forecastMonths);
+                if (prefs.showSetup !== undefined) setShowSetup(prefs.showSetup);
+                if (prefs.showRecurring !== undefined) setShowRecurring(prefs.showRecurring);
+                if (prefs.showOneTime !== undefined) setShowOneTime(prefs.showOneTime);
+                if (prefs.viewMode !== undefined) setViewMode(prefs.viewMode);
+                if (prefs.hidePrevious !== undefined) setHidePrevious(prefs.hidePrevious);
+                if (prefs.displayStartDate !== undefined) setDisplayStartDate(prefs.displayStartDate);
+            };
+
+            const getTodayString = () => {
+                const t = new Date();
+                return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+            };
+
+            const handleHidePreviousChange = (checked) => {
+                setHidePrevious(checked);
+                if (checked) {
+                    setDisplayStartDate(getTodayString());
+                } else {
+                    setDisplayStartDate('');
+                }
+            };
+
+            const handleDisplayStartDateChange = (val) => {
+                setDisplayStartDate(val);
+                setHidePrevious(val !== '');
+            };
+
+            // Scenario C on mount: real data exists → My Data mode; otherwise Demo mode
+            useEffect(() => {
+                const userData = loadUserData();
+                if (userData) {
+                    setStartingBalance(userData.startingBalance || 0);
+                    setTransactions(userData.transactions || []);
+                    setRecurringTemplates(userData.recurringTemplates || []);
+                    setIsDemo(false);
+                    // Restore UI prefs — from saved prefs or embedded in export file
+                    const savedPrefs = loadUiPrefs();
+                    const embedPrefs = userData.uiPrefs || null;
+                    applyUiPrefs(savedPrefs || embedPrefs);
+                } else {
+                    setStartingBalance(0);
+                    setTransactions([]);
+                    setRecurringTemplates([]);
+                    setIsDemo(true);
+                    applyUiPrefs(DEMO_UI);
+                }
+            }, []);
+
+            // Save user data only when NOT in demo mode
+            useEffect(() => {
+                if (isDemo) return;
+                saveUserData(startingBalance, transactions, recurringTemplates);
+            }, [startingBalance, transactions, recurringTemplates, isDemo]);
+
+            // Save UI prefs only when NOT in demo mode
+            useEffect(() => {
+                if (isDemo) return;
+                saveUiPrefs({ forecastMonths, showSetup, showRecurring, showOneTime, viewMode, hidePrevious, displayStartDate });
+            }, [forecastMonths, showSetup, showRecurring, showOneTime, viewMode, hidePrevious, displayStartDate, isDemo]);
+
+            const switchToDemo = () => {
+                setIsDemo(true);
+                applyUiPrefs(DEMO_UI);
+            };
+
+            const switchToMyData = () => {
+                const userData = loadUserData();
+                if (userData) {
+                    setStartingBalance(userData.startingBalance || 0);
+                    setTransactions(userData.transactions || []);
+                    setRecurringTemplates(userData.recurringTemplates || []);
+                } else {
+                    setStartingBalance(0);
+                    setTransactions([]);
+                    setRecurringTemplates([]);
+                }
+                setIsDemo(false);
+                const savedPrefs = loadUiPrefs();
+                applyUiPrefs(savedPrefs);
+            };
+
+            // Strict segregation: demo mode always reads DEMO_DATA, never touches state
+            const activeStartingBalance = isDemo ? DEMO_DATA.startingBalance : startingBalance;
+            const activeTransactions = isDemo ? DEMO_DATA.transactions : transactions;
+            const activeRecurringTemplates = isDemo ? DEMO_DATA.recurringTemplates : recurringTemplates;
+
+            const addTransaction = () => {
+                if (isDemo) return;
+                if (newTransaction.name && newTransaction.date) {
+                    if (newTransaction.isOverride && newTransaction.overrideBalance === '') {
+                        alert('Please enter a balance amount for override transaction');
+                        return;
+                    }
+                    if (!newTransaction.isOverride && !newTransaction.amount) {
+                        alert('Please enter an amount');
+                        return;
+                    }
+                    
+                    setTransactions([...transactions, {
+                        ...newTransaction,
+                        id: Date.now(),
+                        amount: newTransaction.isOverride ? 0 : parseFloat(newTransaction.amount),
+                        overrideBalance: newTransaction.isOverride ? parseFloat(newTransaction.overrideBalance) : null,
+                        isRecurring: false
+                    }]);
+                    setNewTransaction({
+                        name: '',
+                        amount: '',
+                        date: '',
+                        type: 'expense',
+                        isOverride: false,
+                        overrideBalance: ''
+                    });
+                }
+            };
+
+            const addRecurringTemplate = () => {
+                if (isDemo) return;
+                if (newRecurring.name && newRecurring.amount && newRecurring.startDate) {
+                    const template = {
+                        ...newRecurring,
+                        id: Date.now(),
+                        amount: parseFloat(newRecurring.amount)
+                    };
+                    
+                    if (newRecurring.intervalType === 'monthDay') {
+                        template.monthDay = parseInt(newRecurring.monthDay);
+                    } else {
+                        template.intervalValue = parseInt(newRecurring.intervalValue);
+                    }
+                    
+                    setRecurringTemplates([...recurringTemplates, template]);
+                    setNewRecurring({
+                        name: '',
+                        amount: '',
+                        startDate: '',
+                        endDate: '',
+                        type: 'expense',
+                        intervalType: 'days',
+                        intervalValue: 30,
+                        monthDay: 1
+                    });
+                }
+            };
+
+            const deleteTransaction = (id) => {
+                if (isDemo) return;
+                const t = transactions.find(tx => tx.id === id);
+                const label = t ? (t.isOverride ? 'balance adjustment' : 'transaction') : 'item';
+                const name = t ? t.name : '';
+                if (!confirm('Delete ' + label + ' "' + name + '"? This cannot be undone.')) return;
+                setTransactions(transactions.filter(tx => tx.id !== id));
+            };
+
+            const startEditTransaction = (transaction) => {
+                setEditingTransaction({
+                    ...transaction,
+                    amount: transaction.amount.toString(),
+                    overrideBalance: transaction.overrideBalance !== null ? transaction.overrideBalance.toString() : ''
+                });
+            };
+
+            const saveEditTransaction = () => {
+                if (isDemo) return;
+                if (!editingTransaction.name || !editingTransaction.date) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                if (editingTransaction.isOverride && editingTransaction.overrideBalance === '') {
+                    alert('Please enter a balance amount for override transaction');
+                    return;
+                }
+                if (!editingTransaction.isOverride && !editingTransaction.amount) {
+                    alert('Please enter an amount');
+                    return;
+                }
+
+                setTransactions(transactions.map(t => 
+                    t.id === editingTransaction.id 
+                        ? {
+                            ...editingTransaction,
+                            amount: editingTransaction.isOverride ? 0 : parseFloat(editingTransaction.amount),
+                            overrideBalance: editingTransaction.isOverride ? parseFloat(editingTransaction.overrideBalance) : null
+                        }
+                        : t
+                ));
+                setEditingTransaction(null);
+            };
+
+            const cancelEditTransaction = () => {
+                setEditingTransaction(null);
+            };
+
+            const deleteRecurringTemplate = (id) => {
+                if (isDemo) return;
+                const t = recurringTemplates.find(tx => tx.id === id);
+                const name = t ? t.name : '';
+                if (!confirm('Delete recurring template "' + name + '"? All future occurrences will be removed. This cannot be undone.')) return;
+                setRecurringTemplates(recurringTemplates.filter(tx => tx.id !== id));
+            };
+
+            const startEditTemplate = (template) => {
+                setEditingTemplate({
+                    ...template,
+                    amount: template.amount.toString(),
+                    intervalValue: template.intervalValue ? template.intervalValue.toString() : '30',
+                    monthDay: template.monthDay ? template.monthDay.toString() : '1'
+                });
+            };
+
+            const saveEditTemplate = () => {
+                if (isDemo) return;
+                if (!editingTemplate.name || !editingTemplate.amount || !editingTemplate.startDate) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                const updatedTemplate = {
+                    ...editingTemplate,
+                    amount: parseFloat(editingTemplate.amount)
+                };
+
+                if (editingTemplate.intervalType === 'monthDay') {
+                    updatedTemplate.monthDay = parseInt(editingTemplate.monthDay);
+                } else {
+                    updatedTemplate.intervalValue = parseInt(editingTemplate.intervalValue);
+                }
+
+                setRecurringTemplates(recurringTemplates.map(t => 
+                    t.id === editingTemplate.id ? updatedTemplate : t
+                ));
+                setEditingTemplate(null);
+            };
+
+            const cancelEditTemplate = () => {
+                setEditingTemplate(null);
+            };
+
+            const generateRecurringTransactions = () => {
+                const generated = [];
+                const endDate = new Date();
+                endDate.setMonth(endDate.getMonth() + forecastMonths);
+
+                activeRecurringTemplates.forEach(template => {
+                    let currentDate = parseLocalDate(template.startDate);
+                    const templateEndDate = template.endDate ? parseLocalDate(template.endDate) : null;
+                    
+                    while (currentDate <= endDate) {
+                        if (templateEndDate && currentDate > templateEndDate) break;
+                        generated.push({
+                            id: 'recurring-' + template.id + '-' + currentDate.getTime(),
+                            name: template.name,
+                            amount: template.amount,
+                            date: currentDate.getFullYear() + '-' + 
+                                  String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                                  String(currentDate.getDate()).padStart(2, '0'),
+                            type: template.type,
+                            isRecurring: true,
+                            templateId: template.id
+                        });
+
+                        if (template.intervalType === 'days') {
+                            currentDate = new Date(currentDate.getTime());
+                            currentDate.setDate(currentDate.getDate() + template.intervalValue);
+                        } else if (template.intervalType === 'months') {
+                            currentDate = new Date(currentDate.getTime());
+                            currentDate.setMonth(currentDate.getMonth() + template.intervalValue);
+                        } else if (template.intervalType === 'monthDay') {
+                            currentDate = new Date(currentDate.getTime());
+                            currentDate.setMonth(currentDate.getMonth() + 1);
+                            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+                            currentDate.setDate(Math.min(template.monthDay, daysInMonth));
+                        }
+                    }
+                });
+
+                return generated;
+            };
+
+            const exportData = () => {
+                if (isDemo) return;
+                const dataToExport = {
+                    startingBalance,
+                    transactions,
+                    recurringTemplates,
+                    uiPrefs: { forecastMonths, showSetup, showRecurring, showOneTime, viewMode, hidePrevious, displayStartDate },
+                    exportDate: new Date().toISOString()
+                };
+                const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'driftmoney-backup-' + new Date().toISOString().split('T')[0] + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const triggerImport = () => {
+                if (isDemo) return;
+                if (!confirm('⚠️ IMPORT DATA\n\nThis will permanently overwrite all your current transactions, recurring templates, and balance settings with the contents of the imported file. There is no undo.\n\nAre you sure you want to continue?')) return;
+                if (!confirm('⚠️ FINAL WARNING\n\nYour current data will be permanently replaced. This cannot be recovered unless you have exported a backup.\n\nClick OK to overwrite everything.')) return;
+                document.getElementById('importFileInput').click();
+            };
+
+            const importData = (event) => {
+                if (isDemo) { event.target.value = ''; return; }
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const imported = JSON.parse(e.target.result);
+                            setStartingBalance(imported.startingBalance || 0);
+                            setTransactions(imported.transactions || []);
+                            setRecurringTemplates(imported.recurringTemplates || []);
+                            if (imported.uiPrefs) {
+                                applyUiPrefs(imported.uiPrefs);
+                                saveUiPrefs(imported.uiPrefs);
+                            }
+                            alert('Data imported successfully!');
+                        } catch (error) {
+                            alert('Error importing file. Please make sure it is a valid backup file.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+                event.target.value = '';
+            };
+
+            const resetData = () => {
+                if (isDemo) return;
+                if (!confirm('⚠️ RESET ALL DATA\n\nThis will permanently delete every transaction, recurring template, and balance setting. There is no undo.\n\nAre you sure you want to continue?')) return;
+                if (!confirm('⚠️ FINAL WARNING\n\nYou are about to erase all your data. This cannot be recovered unless you have an export backup.\n\nClick OK to permanently delete everything.')) return;
+                setStartingBalance(0);
+                setTransactions([]);
+                setRecurringTemplates([]);
+                localStorage.removeItem(USER_KEY);
+                localStorage.removeItem(UI_KEY);
+            };
+
+            const calculateRunningBalance = () => {
+                const allTransactions = [...activeTransactions, ...generateRecurringTransactions()];
+                const sorted = allTransactions.sort((a, b) => 
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                );
+                
+                let balance = activeStartingBalance;
+                return sorted.map(t => {
+                    if (t.isOverride) {
+                        balance = t.overrideBalance;
+                    } else if (t.type === 'income') {
+                        balance += t.amount;
+                    } else {
+                        balance -= t.amount;
+                    }
+                    return { ...t, runningBalance: balance };
+                });
+            };
+
+            const balanceData = calculateRunningBalance();
+            
+            // Filter data based on displayStartDate
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const filterCutoff = displayStartDate ? parseLocalDate(displayStartDate) : null;
+            const filteredData = balanceData.filter(item => {
+                if (!filterCutoff) return true;
+                const itemDate = parseLocalDate(item.date);
+                return itemDate >= filterCutoff;
+            });
+            
+            // Calculate balance as of the display start date
+            const cutoffBalance = (() => {
+                if (!filterCutoff || balanceData.length === 0) return null;
+                const previousTransactions = balanceData.filter(item => {
+                    const itemDate = parseLocalDate(item.date);
+                    return itemDate < filterCutoff;
+                });
+                if (previousTransactions.length === 0) return startingBalance;
+                return previousTransactions[previousTransactions.length - 1].runningBalance;
+            })();
+            
+            const lowestBalance = balanceData.length > 0 
+                ? Math.min(...balanceData.map(d => d.runningBalance))
+                : startingBalance;
+            const endingBalance = balanceData.length > 0 
+                ? balanceData[balanceData.length - 1].runningBalance 
+                : startingBalance;
+
+            // Calculate totals from filtered data when filtering
+            const displayData = filterCutoff ? filteredData : balanceData;
+            const totalIncome = displayData
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const totalExpenses = displayData
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            // Build monthly summary rows (complete months only)
+            const monthlyData = (() => {
+                if (balanceData.length === 0) return [];
+                // Determine last complete month boundary within forecast
+                const forecastEnd = new Date();
+                forecastEnd.setMonth(forecastEnd.getMonth() + forecastMonths);
+                const lastCompleteMonth = new Date(forecastEnd.getFullYear(), forecastEnd.getMonth(), 0); // last day of prev month
+
+                // Source data: filtered if cutoff set, else all
+                const source = filterCutoff ? filteredData : balanceData;
+                if (source.length === 0) return [];
+
+                const months = {};
+                source.forEach(item => {
+                    const d = parseLocalDate(item.date);
+                    if (d > lastCompleteMonth) return;
+                    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                    if (!months[key]) months[key] = { key, year: d.getFullYear(), month: d.getMonth(), items: [] };
+                    months[key].items.push(item);
+                });
+
+                return Object.values(months)
+                    .sort((a, b) => a.key.localeCompare(b.key))
+                    .map(({ key, year, month, items }) => {
+                        const monthStart = new Date(year, month, 1);
+                        // Opening balance: last balance before this month, or startingBalance
+                        const priorItems = balanceData.filter(i => parseLocalDate(i.date) < monthStart);
+                        const openingBalance = priorItems.length > 0
+                            ? priorItems[priorItems.length - 1].runningBalance
+                            : activeStartingBalance;
+                        const endingBal = items[items.length - 1].runningBalance;
+                        const monthIncome = items.filter(i => i.type === 'income').reduce((s, i) => s + i.amount, 0);
+                        const monthExpenses = items.filter(i => i.type === 'expense').reduce((s, i) => s + i.amount, 0);
+                        const net = endingBal - openingBalance;
+                        const label = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        return { key, label, monthIncome, monthExpenses, net, endingBal };
+                    });
+            })();
+
+            const getIntervalDescription = (template) => {
+                if (template.intervalType === 'monthDay') {
+                    return 'Monthly on day ' + template.monthDay;
+                }
+                return 'Every ' + template.intervalValue + ' ' + template.intervalType;
+            };
+            
+            const getTransactionColor = (item) => {
+                if (item.isOverride) return 'bg-yellow-50 border-yellow-500';
+                if (item.type === 'income') return 'bg-green-50 border-green-500';
+                return 'bg-red-50 border-red-500';
+            };
+            
+            const getAmountColor = (item) => {
+                if (item.isOverride) return 'text-yellow-600';
+                if (item.type === 'income') return 'text-green-600';
+                return 'text-red-600';
+            };
+            
+            const fmt = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            const formatAmount = (item) => {
+                if (item.isOverride) {
+                    return 'Set to $' + fmt(item.overrideBalance);
+                }
+                const sign = item.type === 'income' ? '+' : '-';
+                return sign + '$' + fmt(item.amount);
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+                {showAbout ? (
+                    <div className="min-h-screen" style={{backgroundColor:'#d2eaf5'}}>
+                        <div className="max-w-3xl mx-auto px-6 py-8">
+                            <button onClick={() => setShowAbout(false)} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition mb-8 text-sm font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                Back to app
+                            </button>
+                            <div className="mb-10" dangerouslySetInnerHTML={{__html: `<svg height="80" viewBox="266 999 148 40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient gradientTransform="rotate(25)" id="ab-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#000A68" stop-opacity="1"/><stop offset="100%" stop-color="#00C4EE" stop-opacity="1"/></linearGradient><linearGradient xlink:href="#ab-grad" id="ab-lg7" gradientTransform="scale(1.2338041,0.81050145)" x1="4.0525074" y1="25.21764" x2="76.997635" y2="25.21764" gradientUnits="userSpaceOnUse"/><linearGradient xlink:href="#ab-grad" id="ab-lg8" gradientUnits="userSpaceOnUse" gradientTransform="scale(1.2338041,0.81050145)" x1="4.0525074" y1="25.21764" x2="76.997635" y2="25.21764"/><linearGradient xlink:href="#ab-grad" id="ab-lg14" gradientTransform="scale(1.0421762,0.95953063)" x1="-3456.9001" y1="-2014.9167" x2="559.78424" y2="-2014.9167" gradientUnits="userSpaceOnUse"/></defs><g transform="translate(507.73542,307.76324)"><g transform="matrix(0.26458333,0,0,0.26458333,110.06667,955.14583)"><g stroke="none" fill="url(#ab-grad)" transform="matrix(0.65831434,0,0,0.65831434,36.708428,117.08428)" style="fill:url(#ab-lg14)"><g fill="#022239" transform="matrix(6.7462524,0,0,6.7462524,-1788.3365,-1645.1161)"><path d="m 0.92,14.92 h 3.11 c 2.75,0 3.87,-1.3 3.87,-3.87 V 8.19 C 7.9,5.56 6.79,4.26 4.03,4.26 H 0.92 Z M 4.05,5.96 c 1.38,0 1.82,0.62 1.82,2.09 v 3.12 c 0,1.42 -0.44,2.05 -1.82,2.05 H 2.83 V 5.96 Z m 9.05,4.97 1.39,3.99 h 2.17 l -1.79,-4.55 c 0.94,-0.43 1.45,-1.26 1.45,-2.68 v -0.3 c 0,-2.22 -1.24,-3.13 -3.58,-3.13 H 9.63 v 10.66 h 1.92 v -3.99 z m -1.55,-4.9 h 1.2 c 1.1,0 1.6,0.24 1.6,1.46 v 0.17 c 0,1.13 -0.35,1.51 -1.53,1.51 h -1.27 z m 8.23,-1.77 h -1.94 v 10.66 h 1.94 z m 7.88,0 h -6 V 14.92 H 23.6 V 10.5 h 3.45 V 8.79 H 23.6 V 6.02 h 4.06 z M 32.8,14.92 V 5.96 h 2.52 v -1.7 h -6.98 v 1.7 h 2.52 v 8.96 z m 6.74,-8.58 c -0.96,0 -1.59,0.25 -2.06,0.74 L 37.39,6.51 h -1.63 v 8.41 h 1.89 V 9.39 c 0,-0.95 0.5,-1.38 1.28,-1.38 0.94,0 1.25,0.46 1.25,1.61 v 5.3 h 1.89 V 9.6 c 0,-1.14 0.5,-1.59 1.3,-1.59 0.94,0 1.25,0.46 1.25,1.57 v 5.34 h 1.89 V 9.38 c 0,-2.1 -0.73,-3.04 -2.68,-3.04 -1.02,0 -1.82,0.35 -2.28,1 -0.42,-0.69 -1.08,-1 -2.01,-1 z M 49.9,9.63 c 0,-1.26 0.33,-1.62 1.3,-1.62 0.96,0 1.3,0.36 1.3,1.62 v 2.17 c 0,1.26 -0.34,1.64 -1.3,1.64 -0.97,0 -1.3,-0.38 -1.3,-1.64 z m 1.3,-3.29 c -2.19,0 -3.19,1 -3.19,3.31 v 2.14 c 0,2.32 1,3.3 3.19,3.3 2.18,0 3.19,-0.98 3.19,-3.3 V 9.65 c 0,-2.31 -1.01,-3.31 -3.19,-3.31 z m 4.74,0.17 v 8.41 h 1.89 v -5.5 c 0,-0.98 0.49,-1.41 1.29,-1.41 0.94,0 1.25,0.46 1.25,1.57 v 5.34 h 1.89 V 9.38 c 0,-2.04 -0.74,-3.04 -2.56,-3.04 -0.9,0 -1.6,0.25 -2.03,0.76 L 57.58,6.51 Z m 12.31,5.89 c -0.04,0.73 -0.35,1.14 -1.32,1.14 -0.96,0 -1.34,-0.52 -1.34,-1.56 v -0.7 h 4.48 V 9.55 c 0,-2.21 -1.02,-3.21 -3.14,-3.21 -2.15,0 -3.19,1.15 -3.19,3.24 v 2.21 c 0,2.32 1.02,3.3 3.21,3.3 2.15,0 2.99,-0.94 3.05,-2.69 z m -1.3,-4.49 c 0.96,0 1.33,0.52 1.33,1.62 V 9.84 H 65.59 V 9.59 c 0,-1.2 0.38,-1.68 1.36,-1.68 z m 5.15,8.04 c -0.34,0 -0.59,-0.05 -0.81,-0.1 v 1.78 c 0.39,0.11 0.67,0.14 1.12,0.14 1.69,0 2.69,-0.79 3.43,-3.6 l 2.01,-7.66 h -2.1 l -1.23,6.1 -1.57,-6.1 H 70.8 l 2.56,8.29 -0.06,0.22 c -0.19,0.77 -0.7,0.93 -1.2,0.93 z"/></g><g transform="matrix(2.3123796,0,0,2.3123796,-2031.4305,-1692.5013)" stroke="none" style="fill:url(#ab-lg7)"><path d="M 5,25 V 35 C 35,50.8 65,19.2 95,35 V 25 C 65,9.2 35,40.8 5,25 M 5,55 C 35,70.8 65,39.2 95,55 V 45 C 65,29.2 35,60.8 5,45 Z M 5,75 C 35,90.8 65,59.2 95,75 V 65 C 65,49.2 35,80.8 5,65 Z" style="fill:url(#ab-lg8)"/></g></g></g></g></svg>`}} />
+                            <p className="text-slate-600 text-lg mt-2">Stop guessing — stop stressing — see where you're headed</p>
+
+                            <div className="bg-white rounded-xl shadow p-8 mb-6 mt-8">
+                                <h2 className="text-xl font-bold text-slate-800 mb-4">The Story</h2>
+                                <p className="text-slate-700 leading-relaxed">I was guessing and stressing about my finances. Some months had two paychecks, some three — I never really knew where I stood. It took me DAYS to sort this out with spreadsheets so I built this tool for my own use. It's so easy to use that I wanted to share it.</p>
+                            </div>
+
+                            <div className="bg-white rounded-xl shadow p-8 mb-6">
+                                <h2 className="text-xl font-bold text-slate-800 mb-4">How It Works</h2>
+                                <ul className="space-y-4 text-slate-700">
+                                    <li className="flex items-start gap-3"><span className="text-cyan-500 font-bold mt-0.5 shrink-0">1</span><span><strong className="text-slate-800">Setup:</strong> Set your current bank balance as the starting point.</span></li>
+                                    <li className="flex items-start gap-3"><span className="text-cyan-500 font-bold mt-0.5 shrink-0">2</span><span><strong className="text-slate-800">Add Recurring Transaction:</strong> Add your recurring bills and income — rent, paycheck, subscriptions, anything that repeats.</span></li>
+                                    <li className="flex items-start gap-3"><span className="text-cyan-500 font-bold mt-0.5 shrink-0">3</span><span><strong className="text-slate-800">Add One-Time Transaction:</strong> Add special purchases or income. You can even do a Balance Override to reflect your account balance at any time.</span></li>
+                                    <li className="flex items-start gap-3"><span className="text-cyan-500 font-bold mt-0.5 shrink-0">4</span><span><strong className="text-slate-800">Cash Flow Timeline:</strong> Your running balance projected weeks, months, or years into the future. Hide Previous lets you start with today — or any other date.</span></li>
+                                </ul>
+                                <p className="mt-6 text-slate-500 italic text-sm">Remember: this is forecasting, not accounting.</p>
+                            </div>
+
+                            <div className="bg-white rounded-xl shadow p-8 mb-6">
+                                <h2 className="text-xl font-bold text-slate-800 mb-4">Your Privacy</h2>
+                                <p className="text-slate-700 leading-relaxed mb-3">DRIFTmoney runs entirely in your browser. Your financial data is stored only on your device using your browser's local storage — nothing is transmitted to any server, ever. There are no accounts, no tracking, no analytics, no ads.</p>
+                                <p className="text-slate-700 leading-relaxed mb-3">When you close the tab, your data stays on your device. Use the Export button to back it up as a file you control.</p>
+                                <p className="text-slate-700 leading-relaxed">You can even save this page to your computer and run it offline — no internet required.</p>
+                            </div>
+
+                            <div className="bg-white rounded-xl shadow p-8 mb-6">
+                                <h2 className="text-xl font-bold text-slate-800 mb-4">Disclaimer</h2>
+                                <p className="text-slate-700 leading-relaxed">DRIFTmoney is a personal cash flow forecasting tool, not financial advice. The projections it generates are based solely on the data you enter. Always consult a qualified financial advisor for decisions that affect your financial wellbeing.</p>
+                            </div>
+
+                            <div className="bg-white rounded-xl shadow p-8 mb-6">
+                                <h2 className="text-xl font-bold text-slate-800 mb-4">Support This Project</h2>
+                                <p className="text-slate-700 leading-relaxed mb-2">DRIFTmoney is free and will stay free. No subscription, no upsell, no catch.</p>
+                                <p className="text-slate-700 leading-relaxed mb-6">If it's helped you see where you're headed, consider supporting what comes next — mobile sync, new features, and whatever the community asks for.</p>
+                                <a href="https://ko-fi.com/driftmoney" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-3 rounded-lg text-white font-semibold transition hover:opacity-90" style={{backgroundColor:'#00C4EE'}}>
+                                    ☕ Support DRIFTmoney on Ko-fi
+                                </a>
+                            </div>
+
+                            <div className="bg-white rounded-xl shadow p-8 mb-6">
+                                <h2 className="text-xl font-bold text-slate-800 mb-4">Open &amp; Transparent</h2>
+                                <p className="text-slate-700 leading-relaxed mb-3">DRIFTmoney is a single HTML file — there's nothing hidden. You can open it in any text editor and read exactly how it works. It's published on GitHub under the MIT License, which means you're free to use it, modify it, and share it.</p>
+                                <p className="text-slate-500 text-sm">GitHub link coming soon.</p>
+                            </div>
+
+                            <div className="text-center text-slate-400 text-sm pb-8">
+                                <p>DRIFTmoney — built with care, shared freely.</p>
+                            </div>
+
+                            <div className="text-center pb-12">
+                                <button onClick={() => setShowAbout(false)} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-800 text-white rounded-lg transition font-medium">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                    Back to app
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                <div className="p-6">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="rounded-xl shadow-lg p-6 mb-6" style={{backgroundColor:'#d2eaf5'}}>
+                            <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-2">
+                                <div>
+                                    <div className="mb-2" dangerouslySetInnerHTML={{__html: `<svg height="80" viewBox="266 999 148 40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient gradientTransform="rotate(25)" id="dm-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#000A68" stop-opacity="1"/><stop offset="100%" stop-color="#00C4EE" stop-opacity="1"/></linearGradient><linearGradient xlink:href="#dm-grad" id="dm-lg7" gradientTransform="scale(1.2338041,0.81050145)" x1="4.0525074" y1="25.21764" x2="76.997635" y2="25.21764" gradientUnits="userSpaceOnUse"/><linearGradient xlink:href="#dm-grad" id="dm-lg8" gradientUnits="userSpaceOnUse" gradientTransform="scale(1.2338041,0.81050145)" x1="4.0525074" y1="25.21764" x2="76.997635" y2="25.21764"/><linearGradient xlink:href="#dm-grad" id="dm-lg14" gradientTransform="scale(1.0421762,0.95953063)" x1="-3456.9001" y1="-2014.9167" x2="559.78424" y2="-2014.9167" gradientUnits="userSpaceOnUse"/></defs><g transform="translate(507.73542,307.76324)"><g transform="matrix(0.26458333,0,0,0.26458333,110.06667,955.14583)"><g stroke="none" fill="url(#dm-grad)" transform="matrix(0.65831434,0,0,0.65831434,36.708428,117.08428)" style="fill:url(#dm-lg14)"><g fill="#022239" transform="matrix(6.7462524,0,0,6.7462524,-1788.3365,-1645.1161)"><path d="m 0.92,14.92 h 3.11 c 2.75,0 3.87,-1.3 3.87,-3.87 V 8.19 C 7.9,5.56 6.79,4.26 4.03,4.26 H 0.92 Z M 4.05,5.96 c 1.38,0 1.82,0.62 1.82,2.09 v 3.12 c 0,1.42 -0.44,2.05 -1.82,2.05 H 2.83 V 5.96 Z m 9.05,4.97 1.39,3.99 h 2.17 l -1.79,-4.55 c 0.94,-0.43 1.45,-1.26 1.45,-2.68 v -0.3 c 0,-2.22 -1.24,-3.13 -3.58,-3.13 H 9.63 v 10.66 h 1.92 v -3.99 z m -1.55,-4.9 h 1.2 c 1.1,0 1.6,0.24 1.6,1.46 v 0.17 c 0,1.13 -0.35,1.51 -1.53,1.51 h -1.27 z m 8.23,-1.77 h -1.94 v 10.66 h 1.94 z m 7.88,0 h -6 V 14.92 H 23.6 V 10.5 h 3.45 V 8.79 H 23.6 V 6.02 h 4.06 z M 32.8,14.92 V 5.96 h 2.52 v -1.7 h -6.98 v 1.7 h 2.52 v 8.96 z m 6.74,-8.58 c -0.96,0 -1.59,0.25 -2.06,0.74 L 37.39,6.51 h -1.63 v 8.41 h 1.89 V 9.39 c 0,-0.95 0.5,-1.38 1.28,-1.38 0.94,0 1.25,0.46 1.25,1.61 v 5.3 h 1.89 V 9.6 c 0,-1.14 0.5,-1.59 1.3,-1.59 0.94,0 1.25,0.46 1.25,1.57 v 5.34 h 1.89 V 9.38 c 0,-2.1 -0.73,-3.04 -2.68,-3.04 -1.02,0 -1.82,0.35 -2.28,1 -0.42,-0.69 -1.08,-1 -2.01,-1 z M 49.9,9.63 c 0,-1.26 0.33,-1.62 1.3,-1.62 0.96,0 1.3,0.36 1.3,1.62 v 2.17 c 0,1.26 -0.34,1.64 -1.3,1.64 -0.97,0 -1.3,-0.38 -1.3,-1.64 z m 1.3,-3.29 c -2.19,0 -3.19,1 -3.19,3.31 v 2.14 c 0,2.32 1,3.3 3.19,3.3 2.18,0 3.19,-0.98 3.19,-3.3 V 9.65 c 0,-2.31 -1.01,-3.31 -3.19,-3.31 z m 4.74,0.17 v 8.41 h 1.89 v -5.5 c 0,-0.98 0.49,-1.41 1.29,-1.41 0.94,0 1.25,0.46 1.25,1.57 v 5.34 h 1.89 V 9.38 c 0,-2.04 -0.74,-3.04 -2.56,-3.04 -0.9,0 -1.6,0.25 -2.03,0.76 L 57.58,6.51 Z m 12.31,5.89 c -0.04,0.73 -0.35,1.14 -1.32,1.14 -0.96,0 -1.34,-0.52 -1.34,-1.56 v -0.7 h 4.48 V 9.55 c 0,-2.21 -1.02,-3.21 -3.14,-3.21 -2.15,0 -3.19,1.15 -3.19,3.24 v 2.21 c 0,2.32 1.02,3.3 3.21,3.3 2.15,0 2.99,-0.94 3.05,-2.69 z m -1.3,-4.49 c 0.96,0 1.33,0.52 1.33,1.62 V 9.84 H 65.59 V 9.59 c 0,-1.2 0.38,-1.68 1.36,-1.68 z m 5.15,8.04 c -0.34,0 -0.59,-0.05 -0.81,-0.1 v 1.78 c 0.39,0.11 0.67,0.14 1.12,0.14 1.69,0 2.69,-0.79 3.43,-3.6 l 2.01,-7.66 h -2.1 l -1.23,6.1 -1.57,-6.1 H 70.8 l 2.56,8.29 -0.06,0.22 c -0.19,0.77 -0.7,0.93 -1.2,0.93 z"/></g><g transform="matrix(2.3123796,0,0,2.3123796,-2031.4305,-1692.5013)" stroke="none" style="fill:url(#dm-lg7)"><path d="M 5,25 V 35 C 35,50.8 65,19.2 95,35 V 25 C 65,9.2 35,40.8 5,25 M 5,55 C 35,70.8 65,39.2 95,55 V 45 C 65,29.2 35,60.8 5,45 Z M 5,75 C 35,90.8 65,59.2 95,75 V 65 C 65,49.2 35,80.8 5,65 Z" style="fill:url(#dm-lg8)"/></g></g></g></g></svg>`}} />
+                                    <p className="text-slate-600">Stop guessing — stop stressing — see where you're headed</p>
+                                </div>
+                                <div className="flex flex-col items-end gap-3">
+                                    <div className="flex gap-2 items-center">
+                                        <div className="relative group">
+                                            <button
+                                                onClick={exportData}
+                                                disabled={isDemo}
+                                                className={'flex items-center gap-2 px-4 py-2 rounded-lg transition ' + (isDemo ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-50' : 'bg-blue-500 hover:bg-blue-600 text-white')}
+                                            >
+                                                <Download /><span>Export</span>
+                                            </button>
+                                            {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up your accounts</div>}
+                                            {!isDemo && <div className="absolute right-0 top-full mt-1 w-48 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Download a backup of your data</div>}
+                                        </div>
+                                        <div className="relative group">
+                                            <button
+                                                onClick={isDemo ? undefined : triggerImport}
+                                                disabled={isDemo}
+                                                className={'flex items-center gap-2 px-4 py-2 rounded-lg transition ' + (isDemo ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-50' : 'bg-green-500 hover:bg-green-600 text-white')}
+                                            >
+                                                <Upload /><span>Import</span>
+                                            </button>
+                                            {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up your accounts</div>}
+                                            {!isDemo && <div className="absolute right-0 top-full mt-1 w-48 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Restore from a backup file</div>}
+                                        </div>
+                                        <input id="importFileInput" type="file" accept=".json" onChange={importData} className="hidden" />
+                                        <div className="relative group">
+                                            <button
+                                                onClick={isDemo ? undefined : resetData}
+                                                disabled={isDemo}
+                                                className={'flex items-center gap-2 px-4 py-2 rounded-lg transition ' + (isDemo ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-50' : 'bg-red-500 hover:bg-red-600 text-white')}
+                                            >
+                                                <RotateCcw /><span>Reset</span>
+                                            </button>
+                                            {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up your accounts</div>}
+                                            {!isDemo && <div className="absolute right-0 top-full mt-1 w-48 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Erase all data and start over</div>}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="relative group">
+                                            <button onClick={() => setShowAbout(true)} className="flex items-center gap-1 px-3 py-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-white transition text-sm font-medium">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                                <span>About</span>
+                                            </button>
+                                            <div className="absolute left-0 top-full mt-1 w-44 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">About DRIFTmoney, privacy & support</div>
+                                        </div>
+                                        <div className="flex rounded-lg border-2 overflow-hidden text-sm font-semibold">
+                                            <div className="relative group">
+                                                <button
+                                                    onClick={switchToDemo}
+                                                    className={'px-4 py-2 transition ' + (isDemo ? 'bg-red-500 text-white' : 'bg-white text-slate-500 hover:bg-slate-50')}
+                                                >Demo Data</button>
+                                                <div className="absolute left-0 top-full mt-1 w-52 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 font-normal">{isDemo ? 'You\'re viewing sample data — nothing here is real' : 'Switch to sample data to explore features'}</div>
+                                            </div>
+                                            <div className="relative group">
+                                                <button
+                                                    onClick={switchToMyData}
+                                                    className={'px-4 py-2 transition ' + (!isDemo ? 'bg-slate-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-50')}
+                                                >My Data</button>
+                                                <div className="absolute right-0 top-full mt-1 w-52 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 font-normal">{!isDemo ? 'Your real data — saved in this browser' : 'Switch to enter and track your own finances'}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className={isDemo ? 'mt-1 text-base font-semibold text-red-500' : 'mt-1 text-base text-slate-500'}>{isDemo ? '👆 You\'re viewing demo data. Switch to "My Data" to get started.' : 'Your data is saved in this browser only — nothing is sent to any server.'}</p>
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                            <button 
+                                onClick={() => setShowSetup(!showSetup)}
+                                className="w-full flex items-center justify-between text-xl font-bold text-slate-800 mb-4 hover:text-slate-600 transition"
+                            >
+                                <span>Setup</span>
+                                {showSetup ? <ChevronUp /> : <ChevronDown />}
+                            </button>
+                            
+                            {showSetup && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="bg-white rounded-lg shadow p-5">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-slate-600 text-sm">Starting Balance</span>
+                                    <DollarSign />
+                                </div>
+                                <div className="flex items-center border-b-2 border-blue-500">
+                                    <span className={'text-2xl font-bold ' + (isDemo ? 'text-slate-400' : 'text-slate-800')}>$</span>
+                                    <input type="text" inputMode="decimal" value={balanceFocused ? balanceRawInput : activeStartingBalance.toFixed(2)} onFocus={() => { setBalanceFocused(true); setBalanceRawInput(String(activeStartingBalance)); }} onBlur={() => { setBalanceFocused(false); if (!isDemo) setStartingBalance(parseFloat(balanceRawInput) || 0); }} onChange={(e) => { if (!isDemo) setBalanceRawInput(e.target.value); }} onKeyDown={(e) => { if (e.key === 'Enter') { e.target.blur(); } }} readOnly={isDemo} className={'text-2xl font-bold text-slate-800 w-full focus:outline-none ' + (isDemo ? 'text-slate-400 cursor-not-allowed' : '')} placeholder="0.00" />
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow p-5">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-slate-600 text-sm">Forecast Period</span>
+                                    <Calendar />
+                                </div>
+                                <select value={forecastMonths} onChange={(e) => setForecastMonths(parseInt(e.target.value))} className="text-2xl font-bold text-slate-800 w-full border-b-2 border-purple-500 focus:outline-none bg-white">
+                                    <option value="1">1 Month</option>
+                                    <option value="2">2 Months</option>
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12">12 Months</option>
+                                    <option value="24">24 Months</option>
+                                    <option value="36">36 Months</option>
+                                </select>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow p-5">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-slate-600 text-sm">Lowest Balance</span>
+                                    <div className={lowestBalance < 0 ? 'text-red-500' : 'text-orange-500'}>
+                                        <TrendingDown />
+                                    </div>
+                                </div>
+                                <div className={'text-2xl font-bold ' + (lowestBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
+                                    ${fmt(lowestBalance)}
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow p-5">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-slate-600 text-sm">Ending Balance</span>
+                                    <div className={endingBalance > startingBalance ? 'text-green-500' : 'text-slate-500'}>
+                                        <TrendingUp />
+                                    </div>
+                                </div>
+                                <div className={'text-2xl font-bold ' + (endingBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
+                                    ${fmt(endingBalance)}
+                                </div>
+                            </div>
+                        </div>
+                            )}
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                            <button 
+                                onClick={() => setShowRecurring(!showRecurring)}
+                                className="w-full flex items-center justify-between text-xl font-bold text-slate-800 mb-4 hover:text-purple-600 transition"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Repeat />
+                                    <span>Add Recurring Transaction</span>
+                                </div>
+                                {showRecurring ? <ChevronUp /> : <ChevronDown />}
+                            </button>
+                            
+                            {showRecurring && (
+                            <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-3">
+                                <input type="text" placeholder="Name (e.g., Rent, Paycheck)" value={newRecurring.name} onChange={(e) => setNewRecurring({...newRecurring, name: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                                <input type="number" placeholder="Amount" value={newRecurring.amount} onChange={(e) => setNewRecurring({...newRecurring, amount: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                                <input type="date" value={newRecurring.startDate} onChange={(e) => setNewRecurring({...newRecurring, startDate: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" title="Start date" />
+                                <input type="date" value={newRecurring.endDate} onChange={(e) => setNewRecurring({...newRecurring, endDate: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none text-slate-400" title="End date (optional)" placeholder="End date (optional)" />
+                                <select value={newRecurring.type} onChange={(e) => setNewRecurring({...newRecurring, type: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white">
+                                    <option value="expense">Expense</option>
+                                    <option value="income">Income</option>
+                                </select>
+                                <select value={newRecurring.intervalType} onChange={(e) => setNewRecurring({...newRecurring, intervalType: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white">
+                                    <option value="days">Every X Days</option>
+                                    <option value="months">Every X Months</option>
+                                    <option value="monthDay">Monthly on Day</option>
+                                </select>
+                                {newRecurring.intervalType === 'monthDay' ? (
+                                    <input type="number" placeholder="Day of Month (1-31)" value={newRecurring.monthDay} onChange={(e) => setNewRecurring({...newRecurring, monthDay: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" min="1" max="31" />
+                                ) : (
+                                    <input type="number" placeholder="Interval" value={newRecurring.intervalValue} onChange={(e) => setNewRecurring({...newRecurring, intervalValue: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" min="1" />
+                                )}
+                                <div className="relative group">
+                                <button onClick={addRecurringTemplate} disabled={isDemo} className={'rounded-lg px-4 py-2 flex items-center justify-center gap-2 transition ' + (isDemo ? 'bg-purple-200 text-purple-300 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600 text-white')}>
+                                    <Plus />
+                                    <span>Add</span>
+                                </button>
+                                {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up accounts</div>}
+                                </div>
+                            </div>
+                            
+                            {activeRecurringTemplates.length > 0 && (
+                                <div className="mt-4 space-y-2">
+                                    <h3 className="font-semibold text-slate-700 text-sm">Active Recurring Transactions:</h3>
+                                    {activeRecurringTemplates.map(template => (
+                                        <div key={template.id}>
+                                            {editingTemplate && editingTemplate.id === template.id ? (
+                                                <div className="p-3 bg-blue-50 rounded-lg border border-blue-500">
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-2">
+                                                            <input type="text" placeholder="Name" value={editingTemplate.name} onChange={(e) => setEditingTemplate({...editingTemplate, name: e.target.value})} className="border rounded px-2 py-1 text-sm" />
+                                                            <input type="number" placeholder="Amount" value={editingTemplate.amount} onChange={(e) => setEditingTemplate({...editingTemplate, amount: e.target.value})} className="border rounded px-2 py-1 text-sm" />
+                                                            <input type="date" value={editingTemplate.startDate} onChange={(e) => setEditingTemplate({...editingTemplate, startDate: e.target.value})} className="border rounded px-2 py-1 text-sm" title="Start date" />
+                                                            <input type="date" value={editingTemplate.endDate || ''} onChange={(e) => setEditingTemplate({...editingTemplate, endDate: e.target.value})} className="border rounded px-2 py-1 text-sm" title="End date (optional)" />
+                                                            <select value={editingTemplate.type} onChange={(e) => setEditingTemplate({...editingTemplate, type: e.target.value})} className="border rounded px-2 py-1 text-sm bg-white">
+                                                                <option value="expense">Expense</option>
+                                                                <option value="income">Income</option>
+                                                            </select>
+                                                            <select value={editingTemplate.intervalType} onChange={(e) => setEditingTemplate({...editingTemplate, intervalType: e.target.value})} className="border rounded px-2 py-1 text-sm bg-white">
+                                                                <option value="days">Every X Days</option>
+                                                                <option value="months">Every X Months</option>
+                                                                <option value="monthDay">Monthly on Day</option>
+                                                            </select>
+                                                            {editingTemplate.intervalType === 'monthDay' ? (
+                                                                <input type="number" placeholder="Day (1-31)" value={editingTemplate.monthDay} onChange={(e) => setEditingTemplate({...editingTemplate, monthDay: e.target.value})} className="border rounded px-2 py-1 text-sm" min="1" max="31" />
+                                                            ) : (
+                                                                <input type="number" placeholder="Interval" value={editingTemplate.intervalValue} onChange={(e) => setEditingTemplate({...editingTemplate, intervalValue: e.target.value})} className="border rounded px-2 py-1 text-sm" min="1" />
+                                                            )}
+                                                            <div className="flex gap-2">
+                                                                <button onClick={saveEditTemplate} className="flex items-center gap-1 px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm transition">
+                                                                    <Save />
+                                                                </button>
+                                                                <button onClick={cancelEditTemplate} className="flex items-center gap-1 px-2 py-1 bg-slate-400 hover:bg-slate-500 text-white rounded text-sm transition">
+                                                                    <X />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                                    <div className="flex items-center gap-3 flex-wrap">
+                                                        <Repeat />
+                                                        <span className="font-medium text-slate-800">{template.name}</span>
+                                                        <span className={'font-semibold ' + (template.type === 'income' ? 'text-green-600' : 'text-red-600')}>
+                                                            {template.type === 'income' ? '+' : '-'}${fmt(template.amount)}
+                                                        </span>
+                                                        <span className="text-sm text-slate-600">{getIntervalDescription(template)}</span>
+                                                        <span className="text-xs text-slate-500">(starts {parseLocalDate(template.startDate).toLocaleDateString()}{template.endDate ? ' · ends ' + parseLocalDate(template.endDate).toLocaleDateString() : ''})</span>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => startEditTemplate(template)} className="text-slate-400 hover:text-blue-500 transition" title="Edit">
+                                                            <Edit />
+                                                        </button>
+                                                        <button onClick={() => deleteRecurringTemplate(template.id)} className="text-slate-400 hover:text-red-500 transition" title="Delete">
+                                                            <Trash2 />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            </>
+                            )}
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                            <button 
+                                onClick={() => setShowOneTime(!showOneTime)}
+                                className="w-full flex items-center justify-between text-xl font-bold text-slate-800 mb-4 hover:text-blue-600 transition"
+                            >
+                                <span>Add One-Time Transaction</span>
+                                {showOneTime ? <ChevronUp /> : <ChevronDown />}
+                            </button>
+                            
+                            {showOneTime && (
+                            <>
+                            <div className="mb-3">
+                                <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                                    <input type="checkbox" checked={newTransaction.isOverride} onChange={(e) => setNewTransaction({...newTransaction, isOverride: e.target.checked})} className="rounded" />
+                                    <span>Balance Override (set exact balance instead of adding/subtracting)</span>
+                                </label>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                                <input type="text" placeholder="Name" value={newTransaction.name} onChange={(e) => setNewTransaction({...newTransaction, name: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                {newTransaction.isOverride ? (
+                                    <input type="number" placeholder="Set Balance To" value={newTransaction.overrideBalance} onChange={(e) => setNewTransaction({...newTransaction, overrideBalance: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                ) : (
+                                    <input type="number" placeholder="Amount" value={newTransaction.amount} onChange={(e) => setNewTransaction({...newTransaction, amount: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                )}
+                                <input type="date" value={newTransaction.date} onChange={(e) => setNewTransaction({...newTransaction, date: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                {!newTransaction.isOverride && (
+                                    <select value={newTransaction.type} onChange={(e) => setNewTransaction({...newTransaction, type: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                                        <option value="expense">Expense</option>
+                                        <option value="income">Income</option>
+                                    </select>
+                                )}
+                                {newTransaction.isOverride && <div></div>}
+                                <div className="relative group">
+                                <button onClick={addTransaction} disabled={isDemo} className={'rounded-lg px-4 py-2 flex items-center justify-center gap-2 transition ' + (isDemo ? 'bg-blue-200 text-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white')}>
+                                    <Plus />
+                                    <span>Add</span>
+                                </button>
+                                {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up accounts</div>}
+                                </div>
+                            </div>
+                            </>
+                            )}
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4">
+                                <h2 className="text-xl font-bold text-slate-800">Cash Flow Timeline</h2>
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                    <div className="flex rounded-lg border border-slate-200 overflow-hidden text-sm">
+                                        <button
+                                            onClick={() => setViewMode('detailed')}
+                                            className={'px-3 py-1 transition ' + (viewMode === 'detailed' ? 'bg-slate-700 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}
+                                        >Detailed</button>
+                                        <button
+                                            onClick={() => setViewMode('monthly')}
+                                            className={'px-3 py-1 transition ' + (viewMode === 'monthly' ? 'bg-slate-700 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}
+                                        >Monthly</button>
+                                    </div>
+                                    <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={hidePrevious} 
+                                            onChange={(e) => handleHidePreviousChange(e.target.checked)} 
+                                            className="rounded" 
+                                        />
+                                        <span>Hide Previous</span>
+                                    </label>
+                                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                                        <span>Start:</span>
+                                        <input
+                                            type="date"
+                                            value={displayStartDate}
+                                            onChange={(e) => handleDisplayStartDateChange(e.target.value)}
+                                            className="border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                        />
+                                        {displayStartDate && (
+                                            <button
+                                                onClick={() => handleDisplayStartDateChange('')}
+                                                className="text-slate-400 hover:text-red-500 transition"
+                                                title="Clear date filter"
+                                            ><X /></button>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-4 text-sm">
+                                        <span className="text-green-600 font-semibold">Income: ${fmt(totalIncome)}</span>
+                                        <span className="text-red-600 font-semibold">Expenses: ${fmt(totalExpenses)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {(() => {
+                                if (balanceData.length === 0) {
+                                    return (
+                                        <div className="text-center py-12 text-slate-400">
+                                            <div className="w-16 h-16 mx-auto mb-3 opacity-50"><DollarSign /></div>
+                                            <p>No transactions yet. Add recurring or one-time transactions above.</p>
+                                        </div>
+                                    );
+                                }
+                                
+                                if (filteredData.length === 0) {
+                                    return (
+                                        <div className="text-center py-12 text-slate-400">
+                                            <div className="w-16 h-16 mx-auto mb-3 opacity-50"><Calendar /></div>
+                                            <p>No transactions in this date range. Clear the start date to see all transactions.</p>
+                                        </div>
+                                    );
+                                }
+
+                                const balanceHeader = filterCutoff && cutoffBalance !== null && (
+                                    <div className="p-4 rounded-lg bg-blue-50 border-l-4 border-blue-500 mb-2">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <Calendar />
+                                                <div>
+                                                    <div className="font-semibold text-slate-800">Balance as of</div>
+                                                    <div className="text-sm text-slate-600">{filterCutoff.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xs text-slate-500">Balance</div>
+                                                <div className={'font-bold text-2xl ' + (cutoffBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
+                                                    ${fmt(cutoffBalance)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+
+                                if (viewMode === 'monthly') {
+                                    if (monthlyData.length === 0) {
+                                        return (
+                                            <div className="text-center py-12 text-slate-400">
+                                                <div className="w-16 h-16 mx-auto mb-3 opacity-50"><Calendar /></div>
+                                                <p>No complete months in the current forecast window.</p>
+                                            </div>
+                                        );
+                                    }
+                                    return (
+                                        <div className="space-y-2">
+                                            {balanceHeader}
+                                            {monthlyData.map(row => (
+                                                <div key={row.key} className={'p-3 rounded-lg border-l-4 ' + (row.net >= 0 ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500')}>
+                                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+                                                        <div className="font-semibold text-slate-800 text-base">{row.label}</div>
+                                                        <div className="flex items-center justify-end gap-4 ml-auto">
+                                                            <div className="text-right min-w-24">
+                                                                <div className="text-xs text-slate-500">Income</div>
+                                                                <div className="font-semibold text-green-600 whitespace-nowrap">+${fmt(row.monthIncome)}</div>
+                                                            </div>
+                                                            <div className="text-right min-w-24">
+                                                                <div className="text-xs text-slate-500">Expenses</div>
+                                                                <div className="font-semibold text-red-600 whitespace-nowrap">-${fmt(row.monthExpenses)}</div>
+                                                            </div>
+                                                            <div className="text-right min-w-24">
+                                                                <div className="text-xs text-slate-500">Net</div>
+                                                                <div className={'font-bold text-lg whitespace-nowrap ' + (row.net >= 0 ? 'text-green-600' : 'text-red-600')}>
+                                                                    {row.net >= 0 ? '+' : ''}{fmt(row.net)}
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right min-w-28">
+                                                                <div className="text-xs text-slate-500">Balance</div>
+                                                                <div className={'font-bold text-lg whitespace-nowrap ' + (row.endingBal < 0 ? 'text-red-600' : 'text-slate-800')}>
+                                                                    ${fmt(row.endingBal)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                }
+                                
+                                return (
+                                    <div className="space-y-2">
+                                        {balanceHeader}
+                                        {filteredData.map((item) => (
+                                            <div key={item.id}>
+                                            {editingTransaction && editingTransaction.id === item.id ? (
+                                                <div className={'p-3 rounded-lg border-l-4 border-blue-500 bg-blue-50'}>
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                                                            <input type="text" value={editingTransaction.name} onChange={(e) => setEditingTransaction({...editingTransaction, name: e.target.value})} className="border rounded px-2 py-1 text-sm" placeholder="Name" />
+                                                            {editingTransaction.isOverride ? (
+                                                                <input type="number" value={editingTransaction.overrideBalance} onChange={(e) => setEditingTransaction({...editingTransaction, overrideBalance: e.target.value})} className="border rounded px-2 py-1 text-sm" placeholder="Balance" />
+                                                            ) : (
+                                                                <input type="number" value={editingTransaction.amount} onChange={(e) => setEditingTransaction({...editingTransaction, amount: e.target.value})} className="border rounded px-2 py-1 text-sm" placeholder="Amount" />
+                                                            )}
+                                                            <input type="date" value={editingTransaction.date} onChange={(e) => setEditingTransaction({...editingTransaction, date: e.target.value})} className="border rounded px-2 py-1 text-sm" />
+                                                            {!editingTransaction.isOverride && (
+                                                                <select value={editingTransaction.type} onChange={(e) => setEditingTransaction({...editingTransaction, type: e.target.value})} className="border rounded px-2 py-1 text-sm bg-white">
+                                                                    <option value="expense">Expense</option>
+                                                                    <option value="income">Income</option>
+                                                                </select>
+                                                            )}
+                                                            {editingTransaction.isOverride && <div></div>}
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                                                                <input type="checkbox" checked={editingTransaction.isOverride} onChange={(e) => setEditingTransaction({...editingTransaction, isOverride: e.target.checked})} className="rounded" />
+                                                                <span>Balance Override</span>
+                                                            </label>
+                                                            <div className="flex gap-2">
+                                                                <button onClick={saveEditTransaction} className="flex items-center gap-1 px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm transition">
+                                                                    <Save />
+                                                                    <span>Save</span>
+                                                                </button>
+                                                                <button onClick={cancelEditTransaction} className="flex items-center gap-1 px-3 py-1 bg-slate-400 hover:bg-slate-500 text-white rounded text-sm transition">
+                                                                    <X />
+                                                                    <span>Cancel</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className={'p-3 rounded-lg border-l-4 ' + getTransactionColor(item) + (item.isRecurring ? ' opacity-75' : '')}>
+                                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+                                                        <div className="flex items-center gap-3 flex-wrap">
+                                                            <div className="text-sm text-slate-600 font-medium">
+                                                                {parseLocalDate(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                {item.isRecurring && <Repeat />}
+                                                                <div className="font-semibold text-slate-800">{item.name}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center justify-end gap-4 ml-auto">
+                                                            <div className="text-right min-w-24">
+                                                                <div className="text-xs text-slate-500">Amount</div>
+                                                                <div className={'font-bold text-lg whitespace-nowrap ' + getAmountColor(item)}>
+                                                                    {formatAmount(item)}
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right min-w-28">
+                                                                <div className="text-xs text-slate-500">Balance</div>
+                                                                <div className={'font-bold text-lg whitespace-nowrap ' + (item.runningBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
+                                                                    ${fmt(item.runningBalance)}
+                                                                </div>
+                                                            </div>
+                                                            {!item.isRecurring ? (
+                                                                <div className="flex gap-2">
+                                                                    <button onClick={() => startEditTransaction(item)} className="text-slate-400 hover:text-blue-500 transition flex-shrink-0" title="Edit">
+                                                                        <Edit />
+                                                                    </button>
+                                                                    <button onClick={() => deleteTransaction(item.id)} className="text-slate-400 hover:text-red-500 transition flex-shrink-0" title="Delete">
+                                                                        <Trash2 />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="w-5 flex-shrink-0"></div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            </div>
+                                        ))}
+                                </div>
+                                );
+                            })()}
+                        </div>
+                    </div>
+                </div>
+                )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<CashFlowTracker />, document.getElementById('root'));
+    </script>
+</body>
+</html>
