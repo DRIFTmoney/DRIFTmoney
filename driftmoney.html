@@ -467,7 +467,7 @@
             };
 
             const deleteRecurringTemplate = (id) => {
-                if (isDemo) return;
+                if (isDemo) { alert("Switch to 'My Data' to setup your own transactions."); return; }
                 const t = recurringTemplates.find(tx => tx.id === id);
                 const name = t ? t.name : '';
                 if (!confirm('Delete recurring template "' + name + '"? All future occurrences will be removed. This cannot be undone.')) return;
@@ -475,6 +475,7 @@
             };
 
             const startEditTemplate = (template) => {
+                if (isDemo) { alert("Switch to 'My Data' to setup your own transactions."); return; }
                 setEditingTemplate({
                     ...template,
                     amount: template.amount.toString(),
