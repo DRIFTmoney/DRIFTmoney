@@ -475,7 +475,6 @@
             };
 
             const startEditTemplate = (template) => {
-                if (isDemo) { alert("Switch to 'My Data' to setup your own transactions."); return; }
                 setEditingTemplate({
                     ...template,
                     amount: template.amount.toString(),
@@ -485,7 +484,7 @@
             };
 
             const saveEditTemplate = () => {
-                if (isDemo) return;
+                if (isDemo) { alert("Switch to 'My Data' to setup your own transactions."); return; }
                 if (!editingTemplate.name || !editingTemplate.amount || !editingTemplate.startDate) {
                     alert('Please fill in all required fields');
                     return;
