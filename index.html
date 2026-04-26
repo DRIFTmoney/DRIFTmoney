@@ -935,7 +935,7 @@
                             
                             {showSetup && (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="bg-white rounded-lg shadow p-5">
+                            <div className="relative group bg-white rounded-lg shadow p-5">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-slate-600 text-sm">Starting Balance</span>
                                     <DollarSign />
@@ -944,6 +944,7 @@
                                     <span className={'text-2xl font-bold ' + (isDemo ? 'text-slate-400' : 'text-slate-800')}>$</span>
                                     <input type="text" inputMode="decimal" value={balanceFocused ? balanceRawInput : activeStartingBalance.toFixed(2)} onFocus={() => { setBalanceFocused(true); setBalanceRawInput(String(activeStartingBalance)); }} onBlur={() => { setBalanceFocused(false); if (!isDemo) setStartingBalance(parseFloat(balanceRawInput) || 0); }} onChange={(e) => { if (!isDemo) setBalanceRawInput(e.target.value); }} onKeyDown={(e) => { if (e.key === 'Enter') { e.target.blur(); } }} readOnly={isDemo} className={'text-2xl font-bold text-slate-800 w-full focus:outline-none ' + (isDemo ? 'text-slate-400 cursor-not-allowed' : '')} placeholder="0.00" />
                                 </div>
+                                {isDemo && <div className="absolute left-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up your accounts</div>}
                             </div>
 
                             <div className="bg-white rounded-lg shadow p-5">
