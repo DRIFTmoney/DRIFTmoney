@@ -9,6 +9,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* Hide number input spinners */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FY387MYW4Q"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FY387MYW4Q');
+</script>
 </head>
 <body>
     <div id="root"></div>
@@ -39,7 +53,7 @@
          * To audit data privacy: search for "localStorage" — that is the only place data is written.
          * There are no fetch() calls, no analytics, no tracking of any kind.
          */
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
         
         const Plus = () => (
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -638,12 +652,11 @@
                 localStorage.removeItem(UI_KEY);
             };
 
-            const calculateRunningBalance = () => {
+            const balanceData = useMemo(() => {
                 const allTransactions = [...activeTransactions, ...generateRecurringTransactions()];
-                const sorted = allTransactions.sort((a, b) => 
+                const sorted = allTransactions.sort((a, b) =>
                     new Date(a.date).getTime() - new Date(b.date).getTime()
                 );
-                
                 let balance = activeStartingBalance;
                 return sorted.map(t => {
                     if (t.isOverride) {
@@ -655,60 +668,56 @@
                     }
                     return { ...t, runningBalance: balance };
                 });
-            };
-
-            const balanceData = calculateRunningBalance();
+            }, [activeTransactions, activeRecurringTemplates, activeStartingBalance, forecastMonths]);
             
-            // Filter data based on displayStartDate
+            // today is stable per render — set once
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const filterCutoff = displayStartDate ? parseLocalDate(displayStartDate) : null;
-            const filteredData = balanceData.filter(item => {
-                if (!filterCutoff) return true;
-                const itemDate = parseLocalDate(item.date);
-                return itemDate >= filterCutoff;
-            });
-            
-            // Calculate balance as of the display start date
-            const cutoffBalance = (() => {
+            const currentMonthKey = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+
+            const filterCutoff = useMemo(() => (
+                displayStartDate ? parseLocalDate(displayStartDate) : null
+            ), [displayStartDate]);
+
+            const filteredData = useMemo(() => {
+                if (!filterCutoff) return balanceData;
+                return balanceData.filter(item => parseLocalDate(item.date) >= filterCutoff);
+            }, [balanceData, filterCutoff]);
+
+            const cutoffBalance = useMemo(() => {
                 if (!filterCutoff || balanceData.length === 0) return null;
-                const previousTransactions = balanceData.filter(item => {
-                    const itemDate = parseLocalDate(item.date);
-                    return itemDate < filterCutoff;
-                });
-                if (previousTransactions.length === 0) return startingBalance;
-                return previousTransactions[previousTransactions.length - 1].runningBalance;
-            })();
-            
-            const lowestBalance = balanceData.length > 0 
-                ? Math.min(...balanceData.map(d => d.runningBalance))
-                : startingBalance;
-            const endingBalance = balanceData.length > 0 
-                ? balanceData[balanceData.length - 1].runningBalance 
-                : startingBalance;
+                const prior = balanceData.filter(item => parseLocalDate(item.date) < filterCutoff);
+                if (prior.length === 0) return activeStartingBalance;
+                return prior[prior.length - 1].runningBalance;
+            }, [balanceData, filterCutoff, activeStartingBalance]);
 
-            // Calculate totals from filtered data when filtering
-            const displayData = filterCutoff ? filteredData : balanceData;
-            const totalIncome = displayData
-                .filter(t => t.type === 'income')
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const totalExpenses = displayData
-                .filter(t => t.type === 'expense')
-                .reduce((sum, t) => sum + t.amount, 0);
+            const lowestBalance = useMemo(() => (
+                balanceData.length > 0
+                    ? Math.min(...balanceData.map(d => d.runningBalance))
+                    : activeStartingBalance
+            ), [balanceData, activeStartingBalance]);
 
-            // Build monthly summary rows (complete months only)
-            const monthlyData = (() => {
+            const endingBalance = useMemo(() => (
+                balanceData.length > 0
+                    ? balanceData[balanceData.length - 1].runningBalance
+                    : activeStartingBalance
+            ), [balanceData, activeStartingBalance]);
+
+            const { totalIncome, totalExpenses } = useMemo(() => {
+                const displayData = filterCutoff ? filteredData : balanceData;
+                return {
+                    totalIncome: displayData.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
+                    totalExpenses: displayData.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
+                };
+            }, [balanceData, filteredData, filterCutoff]);
+
+            const monthlyData = useMemo(() => {
                 if (balanceData.length === 0) return [];
-                // Determine last complete month boundary within forecast
                 const forecastEnd = new Date();
                 forecastEnd.setMonth(forecastEnd.getMonth() + forecastMonths);
-                const lastCompleteMonth = new Date(forecastEnd.getFullYear(), forecastEnd.getMonth(), 0); // last day of prev month
-
-                // Source data: filtered if cutoff set, else all
+                const lastCompleteMonth = new Date(forecastEnd.getFullYear(), forecastEnd.getMonth(), 0);
                 const source = filterCutoff ? filteredData : balanceData;
                 if (source.length === 0) return [];
-
                 const months = {};
                 source.forEach(item => {
                     const d = parseLocalDate(item.date);
@@ -717,12 +726,10 @@
                     if (!months[key]) months[key] = { key, year: d.getFullYear(), month: d.getMonth(), items: [] };
                     months[key].items.push(item);
                 });
-
                 return Object.values(months)
                     .sort((a, b) => a.key.localeCompare(b.key))
                     .map(({ key, year, month, items }) => {
                         const monthStart = new Date(year, month, 1);
-                        // Opening balance: last balance before this month, or startingBalance
                         const priorItems = balanceData.filter(i => parseLocalDate(i.date) < monthStart);
                         const openingBalance = priorItems.length > 0
                             ? priorItems[priorItems.length - 1].runningBalance
@@ -734,7 +741,16 @@
                         const label = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                         return { key, label, monthIncome, monthExpenses, net, endingBal };
                     });
-            })();
+            }, [balanceData, filteredData, filterCutoff, forecastMonths, activeStartingBalance]);
+
+            const lastPastIndex = useMemo(() => {
+                const source = filterCutoff ? filteredData : balanceData;
+                let idx = -1;
+                source.forEach((item, i) => {
+                    if (parseLocalDate(item.date) <= today) idx = i;
+                });
+                return idx;
+            }, [balanceData, filteredData, filterCutoff]);
 
             const getIntervalDescription = (template) => {
                 if (template.intervalType === 'monthDay') {
@@ -742,19 +758,6 @@
                 }
                 return 'Every ' + template.intervalValue + ' ' + template.intervalType;
             };
-
-            // Index of the most recent non-future transaction in filteredData
-            const lastPastIndex = (() => {
-                const source = filterCutoff ? filteredData : balanceData;
-                let idx = -1;
-                source.forEach((item, i) => {
-                    if (parseLocalDate(item.date) <= today) idx = i;
-                });
-                return idx;
-            })();
-
-            // Current month key e.g. "2026-04"
-            const currentMonthKey = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
             
             const getTransactionColor = (item) => {
                 if (item.isOverride) return 'bg-yellow-50 border-yellow-500';
@@ -822,10 +825,10 @@
 
                             <div className="bg-white rounded-xl shadow p-8 mb-6">
                                 <h2 className="text-xl font-bold text-slate-800 mb-4">Your Privacy</h2>
-                                <p className="text-slate-700 leading-relaxed mb-3">DRIFTmoney runs entirely in your browser. Your financial data is stored only on your device using your browser's local storage — nothing is transmitted to any server, ever. There are no accounts, no tracking, no analytics, no ads.</p>
+                                <p className="text-slate-700 leading-relaxed mb-3">DRIFTmoney runs entirely in your browser. Your financial data is stored only on your device using your browser's local storage — your financial data is never transmitted to any server. There are no accounts, no ads, and no analytics on your financial data.</p>
                                 <p className="text-slate-700 leading-relaxed mb-3">When you close the tab, your data stays on your device. Use the Export button to back it up as a file you control.</p>
                                 <p className="text-slate-700 leading-relaxed">You can even save this page to your computer and run it offline — no internet required.</p>
-                            <p className="text-slate-700 leading-relaxed mt-3">The <strong>landing page</strong> (<a href="https://driftmoney.app" className="text-blue-500 hover:text-blue-700 underline">driftmoney.app</a>) uses Google Analytics to collect anonymous usage data — pages visited, session duration, and general location. This helps understand how people find and use the site. <strong>The app itself collects no data whatsoever</strong> — no tracking, no analytics, nothing. Your financial data never leaves your browser under any circumstances.</p>
+                            <p className="text-slate-700 leading-relaxed mt-3">DRIFTmoney uses Google Analytics on both the landing page and the app to collect anonymous usage data — pages visited, session duration, and general location. This helps understand how people find and use the tool. Your financial data never leaves your browser under any circumstances — analytics sees only that you visited, never what you entered.</p>
                             </div>
 
                             <div className="bg-white rounded-xl shadow p-8 mb-6">
@@ -894,8 +897,8 @@
                                     <div className="mb-2" dangerouslySetInnerHTML={{__html: `<svg height="80" viewBox="266 999 148 40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient gradientTransform="rotate(25)" id="dm-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#000A68" stop-opacity="1"/><stop offset="100%" stop-color="#00C4EE" stop-opacity="1"/></linearGradient><linearGradient xlink:href="#dm-grad" id="dm-lg7" gradientTransform="scale(1.2338041,0.81050145)" x1="4.0525074" y1="25.21764" x2="76.997635" y2="25.21764" gradientUnits="userSpaceOnUse"/><linearGradient xlink:href="#dm-grad" id="dm-lg8" gradientUnits="userSpaceOnUse" gradientTransform="scale(1.2338041,0.81050145)" x1="4.0525074" y1="25.21764" x2="76.997635" y2="25.21764"/><linearGradient xlink:href="#dm-grad" id="dm-lg14" gradientTransform="scale(1.0421762,0.95953063)" x1="-3456.9001" y1="-2014.9167" x2="559.78424" y2="-2014.9167" gradientUnits="userSpaceOnUse"/></defs><g transform="translate(507.73542,307.76324)"><g transform="matrix(0.26458333,0,0,0.26458333,110.06667,955.14583)"><g stroke="none" fill="url(#dm-grad)" transform="matrix(0.65831434,0,0,0.65831434,36.708428,117.08428)" style="fill:url(#dm-lg14)"><g fill="#022239" transform="matrix(6.7462524,0,0,6.7462524,-1788.3365,-1645.1161)"><path d="m 0.92,14.92 h 3.11 c 2.75,0 3.87,-1.3 3.87,-3.87 V 8.19 C 7.9,5.56 6.79,4.26 4.03,4.26 H 0.92 Z M 4.05,5.96 c 1.38,0 1.82,0.62 1.82,2.09 v 3.12 c 0,1.42 -0.44,2.05 -1.82,2.05 H 2.83 V 5.96 Z m 9.05,4.97 1.39,3.99 h 2.17 l -1.79,-4.55 c 0.94,-0.43 1.45,-1.26 1.45,-2.68 v -0.3 c 0,-2.22 -1.24,-3.13 -3.58,-3.13 H 9.63 v 10.66 h 1.92 v -3.99 z m -1.55,-4.9 h 1.2 c 1.1,0 1.6,0.24 1.6,1.46 v 0.17 c 0,1.13 -0.35,1.51 -1.53,1.51 h -1.27 z m 8.23,-1.77 h -1.94 v 10.66 h 1.94 z m 7.88,0 h -6 V 14.92 H 23.6 V 10.5 h 3.45 V 8.79 H 23.6 V 6.02 h 4.06 z M 32.8,14.92 V 5.96 h 2.52 v -1.7 h -6.98 v 1.7 h 2.52 v 8.96 z m 6.74,-8.58 c -0.96,0 -1.59,0.25 -2.06,0.74 L 37.39,6.51 h -1.63 v 8.41 h 1.89 V 9.39 c 0,-0.95 0.5,-1.38 1.28,-1.38 0.94,0 1.25,0.46 1.25,1.61 v 5.3 h 1.89 V 9.6 c 0,-1.14 0.5,-1.59 1.3,-1.59 0.94,0 1.25,0.46 1.25,1.57 v 5.34 h 1.89 V 9.38 c 0,-2.1 -0.73,-3.04 -2.68,-3.04 -1.02,0 -1.82,0.35 -2.28,1 -0.42,-0.69 -1.08,-1 -2.01,-1 z M 49.9,9.63 c 0,-1.26 0.33,-1.62 1.3,-1.62 0.96,0 1.3,0.36 1.3,1.62 v 2.17 c 0,1.26 -0.34,1.64 -1.3,1.64 -0.97,0 -1.3,-0.38 -1.3,-1.64 z m 1.3,-3.29 c -2.19,0 -3.19,1 -3.19,3.31 v 2.14 c 0,2.32 1,3.3 3.19,3.3 2.18,0 3.19,-0.98 3.19,-3.3 V 9.65 c 0,-2.31 -1.01,-3.31 -3.19,-3.31 z m 4.74,0.17 v 8.41 h 1.89 v -5.5 c 0,-0.98 0.49,-1.41 1.29,-1.41 0.94,0 1.25,0.46 1.25,1.57 v 5.34 h 1.89 V 9.38 c 0,-2.04 -0.74,-3.04 -2.56,-3.04 -0.9,0 -1.6,0.25 -2.03,0.76 L 57.58,6.51 Z m 12.31,5.89 c -0.04,0.73 -0.35,1.14 -1.32,1.14 -0.96,0 -1.34,-0.52 -1.34,-1.56 v -0.7 h 4.48 V 9.55 c 0,-2.21 -1.02,-3.21 -3.14,-3.21 -2.15,0 -3.19,1.15 -3.19,3.24 v 2.21 c 0,2.32 1.02,3.3 3.21,3.3 2.15,0 2.99,-0.94 3.05,-2.69 z m -1.3,-4.49 c 0.96,0 1.33,0.52 1.33,1.62 V 9.84 H 65.59 V 9.59 c 0,-1.2 0.38,-1.68 1.36,-1.68 z m 5.15,8.04 c -0.34,0 -0.59,-0.05 -0.81,-0.1 v 1.78 c 0.39,0.11 0.67,0.14 1.12,0.14 1.69,0 2.69,-0.79 3.43,-3.6 l 2.01,-7.66 h -2.1 l -1.23,6.1 -1.57,-6.1 H 70.8 l 2.56,8.29 -0.06,0.22 c -0.19,0.77 -0.7,0.93 -1.2,0.93 z"/></g><g transform="matrix(2.3123796,0,0,2.3123796,-2031.4305,-1692.5013)" stroke="none" style="fill:url(#dm-lg7)"><path d="M 5,25 V 35 C 35,50.8 65,19.2 95,35 V 25 C 65,9.2 35,40.8 5,25 M 5,55 C 35,70.8 65,39.2 95,55 V 45 C 65,29.2 35,60.8 5,45 Z M 5,75 C 35,90.8 65,59.2 95,75 V 65 C 65,49.2 35,80.8 5,65 Z" style="fill:url(#dm-lg8)"/></g></g></g></g></svg>`}} />
                                     <p><span style={{background:"linear-gradient(90deg,#000A68,#00C4EE)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",fontWeight:800}}>Stop guessing — stop stressing — see where you're headed</span></p>
                                 </div>
-                                <div className="flex flex-col items-end gap-3">
-                                    <div className="flex gap-2 items-center">
+                                <div className="flex flex-col items-end gap-3 w-full md:w-auto">
+                                    <div className="flex gap-2 items-center justify-end">
                                         <div className="relative group">
                                             <button
                                                 onClick={exportData}
@@ -1041,31 +1044,57 @@
                             
                             {showRecurring && (
                             <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-3">
-                                <input type="text" placeholder="Name (e.g., Rent, Paycheck)" value={newRecurring.name} onChange={(e) => setNewRecurring({...newRecurring, name: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
-                                <input type="number" placeholder="Amount" value={newRecurring.amount} onChange={(e) => setNewRecurring({...newRecurring, amount: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
-                                <input type="date" value={newRecurring.startDate} onChange={(e) => setNewRecurring({...newRecurring, startDate: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" title="Start date" />
-                                <input type="date" value={newRecurring.endDate} onChange={(e) => setNewRecurring({...newRecurring, endDate: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none text-slate-400" title="End date (optional)" placeholder="End date (optional)" />
-                                <select value={newRecurring.type} onChange={(e) => setNewRecurring({...newRecurring, type: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white">
-                                    <option value="expense">Expense</option>
-                                    <option value="income">Income</option>
-                                </select>
-                                <select value={newRecurring.intervalType} onChange={(e) => setNewRecurring({...newRecurring, intervalType: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white">
-                                    <option value="days">Every X Days</option>
-                                    <option value="months">Every X Months</option>
-                                    <option value="monthDay">Monthly on Day</option>
-                                </select>
-                                {newRecurring.intervalType === 'monthDay' ? (
-                                    <input type="number" placeholder="Day of Month (1-31)" value={newRecurring.monthDay} onChange={(e) => setNewRecurring({...newRecurring, monthDay: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" min="1" max="31" />
-                                ) : (
-                                    <input type="number" placeholder="Interval" value={newRecurring.intervalValue} onChange={(e) => setNewRecurring({...newRecurring, intervalValue: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" min="1" />
-                                )}
-                                <div className="relative group">
-                                <button onClick={addRecurringTemplate} disabled={isDemo} className={'rounded-lg px-4 py-2 flex items-center justify-center gap-2 transition ' + (isDemo ? 'bg-purple-200 text-purple-300 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600 text-white')}>
-                                    <Plus />
-                                    <span>Add</span>
-                                </button>
-                                {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up accounts</div>}
+                            <div className="flex gap-2 items-start">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1">
+                                    <div className="flex flex-col">
+                                        <label className="text-xs text-slate-400 mb-1 px-1">Name</label>
+                                        <input type="text" value={newRecurring.name} onChange={(e) => setNewRecurring({...newRecurring, name: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="text-xs text-slate-400 mb-1 px-1">Amount</label>
+                                        <input type="number" value={newRecurring.amount} onChange={(e) => setNewRecurring({...newRecurring, amount: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="text-xs text-slate-400 mb-1 px-1">Start date</label>
+                                        <input type="date" value={newRecurring.startDate} onChange={(e) => setNewRecurring({...newRecurring, startDate: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="text-xs text-slate-400 mb-1 px-1">End date <span className="text-slate-300">(optional)</span></label>
+                                        <input type="date" value={newRecurring.endDate} onChange={(e) => setNewRecurring({...newRecurring, endDate: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none text-slate-400" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="text-xs text-slate-400 mb-1 px-1">Type</label>
+                                        <select value={newRecurring.type} onChange={(e) => setNewRecurring({...newRecurring, type: e.target.value})} className="border rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white text-sm">
+                                            <option value="expense">Expense</option>
+                                            <option value="income">Income</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="text-xs text-slate-400 mb-1 px-1">Repeats</label>
+                                        <select value={newRecurring.intervalType} onChange={(e) => setNewRecurring({...newRecurring, intervalType: e.target.value})} className="border rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white text-sm">
+                                            <option value="days">Every X Days</option>
+                                            <option value="months">Every X Months</option>
+                                            <option value="monthDay">Monthly on Day</option>
+                                        </select>
+                                    </div>
+                                    {newRecurring.intervalType === 'monthDay' ? (
+                                        <div className="flex flex-col">
+                                            <label className="text-xs text-slate-400 mb-1 px-1">Day of month</label>
+                                            <input type="number" value={newRecurring.monthDay} onChange={(e) => setNewRecurring({...newRecurring, monthDay: e.target.value})} className="border rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm" min="1" max="31" />
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col">
+                                            <label className="text-xs text-slate-400 mb-1 px-1">Every</label>
+                                            <input type="number" value={newRecurring.intervalValue} onChange={(e) => setNewRecurring({...newRecurring, intervalValue: e.target.value})} className="border rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm" min="1" />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="relative group flex-shrink-0 mt-5">
+                                    <button onClick={addRecurringTemplate} disabled={isDemo} className={'rounded-lg px-3 py-2 flex items-center justify-center gap-1 transition ' + (isDemo ? 'bg-purple-200 text-purple-300 cursor-not-allowed' : 'bg-purple-500 hover:bg-purple-600 text-white')}>
+                                        <Plus />
+                                        <span>Add</span>
+                                    </button>
+                                    {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up accounts</div>}
                                 </div>
                             </div>
                             
@@ -1153,27 +1182,30 @@
                                     <span>Balance Override (set exact balance instead of adding/subtracting)</span>
                                 </label>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                                <input type="text" placeholder="Name" value={newTransaction.name} onChange={(e) => setNewTransaction({...newTransaction, name: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-                                {newTransaction.isOverride ? (
-                                    <input type="number" placeholder="Set Balance To" value={newTransaction.overrideBalance} onChange={(e) => setNewTransaction({...newTransaction, overrideBalance: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-                                ) : (
-                                    <input type="number" placeholder="Amount" value={newTransaction.amount} onChange={(e) => setNewTransaction({...newTransaction, amount: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-                                )}
-                                <input type="date" value={newTransaction.date} onChange={(e) => setNewTransaction({...newTransaction, date: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-                                {!newTransaction.isOverride && (
-                                    <select value={newTransaction.type} onChange={(e) => setNewTransaction({...newTransaction, type: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
-                                        <option value="expense">Expense</option>
-                                        <option value="income">Income</option>
-                                    </select>
-                                )}
-                                {newTransaction.isOverride && <div></div>}
-                                <div className="relative group">
-                                <button onClick={addTransaction} disabled={isDemo} className={'rounded-lg px-4 py-2 flex items-center justify-center gap-2 transition ' + (isDemo ? 'bg-blue-200 text-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white')}>
-                                    <Plus />
-                                    <span>Add</span>
-                                </button>
-                                {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up accounts</div>}
+                            <div className="flex gap-2 items-start">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1">
+                                    <input type="text" placeholder="Name" value={newTransaction.name} onChange={(e) => setNewTransaction({...newTransaction, name: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                    {newTransaction.isOverride ? (
+                                        <input type="number" placeholder="Set Balance To" value={newTransaction.overrideBalance} onChange={(e) => setNewTransaction({...newTransaction, overrideBalance: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                    ) : (
+                                        <input type="number" placeholder="Amount" value={newTransaction.amount} onChange={(e) => setNewTransaction({...newTransaction, amount: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                    )}
+                                    <input type="date" value={newTransaction.date} onChange={(e) => setNewTransaction({...newTransaction, date: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                                    {!newTransaction.isOverride ? (
+                                        <select value={newTransaction.type} onChange={(e) => setNewTransaction({...newTransaction, type: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                                            <option value="expense">Expense</option>
+                                            <option value="income">Income</option>
+                                        </select>
+                                    ) : (
+                                        <div></div>
+                                    )}
+                                </div>
+                                <div className="relative group flex-shrink-0">
+                                    <button onClick={addTransaction} disabled={isDemo} className={'rounded-lg px-3 py-2 flex items-center justify-center gap-1 transition ' + (isDemo ? 'bg-blue-200 text-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white')}>
+                                        <Plus />
+                                        <span>Add</span>
+                                    </button>
+                                    {isDemo && <div className="absolute right-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up accounts</div>}
                                 </div>
                             </div>
                             </>
@@ -1181,10 +1213,10 @@
                         </div>
 
                         <div className="bg-white rounded-xl shadow-lg p-6">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4">
-                                <h2 className="text-xl font-bold text-slate-800">Cash Flow Timeline</h2>
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                                    <div className="flex rounded-lg border border-slate-200 overflow-hidden text-sm">
+                            <div className="flex flex-col gap-2 mb-4">
+                                <div className="flex items-center justify-between gap-2">
+                                    <h2 className="text-xl font-bold text-slate-800">Cash Flow Timeline</h2>
+                                    <div className="flex rounded-lg border border-slate-200 overflow-hidden text-sm flex-shrink-0">
                                         <button
                                             onClick={() => setViewMode('detailed')}
                                             className={'px-3 py-1 transition ' + (viewMode === 'detailed' ? 'bg-slate-700 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}
@@ -1194,7 +1226,9 @@
                                             className={'px-3 py-1 transition ' + (viewMode === 'monthly' ? 'bg-slate-700 text-white' : 'bg-white text-slate-600 hover:bg-slate-50')}
                                         >Monthly</button>
                                     </div>
-                                    <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                                </div>
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
+                                    <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
                                         <input 
                                             type="checkbox" 
                                             checked={hidePrevious} 
@@ -1203,7 +1237,7 @@
                                         />
                                         <span>Hide Previous</span>
                                     </label>
-                                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                                    <div className="flex items-center gap-2 whitespace-nowrap">
                                         <span>Start:</span>
                                         <input
                                             type="date"
@@ -1219,7 +1253,7 @@
                                             ><X /></button>
                                         )}
                                     </div>
-                                    <div className="flex gap-4 text-sm">
+                                    <div className="flex gap-4 whitespace-nowrap">
                                         <span className="text-green-600 font-semibold">Income: ${fmt(totalIncome)}</span>
                                         <span className="text-red-600 font-semibold">Expenses: ${fmt(totalExpenses)}</span>
                                     </div>
