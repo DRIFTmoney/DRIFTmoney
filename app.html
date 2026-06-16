@@ -576,6 +576,9 @@
                         if (template.intervalType === 'days') {
                             currentDate = new Date(currentDate.getTime());
                             currentDate.setDate(currentDate.getDate() + template.intervalValue);
+                        } else if (template.intervalType === 'weeks') {
+                            currentDate = new Date(currentDate.getTime());
+                            currentDate.setDate(currentDate.getDate() + template.intervalValue * 7);
                         } else if (template.intervalType === 'months') {
                             currentDate = new Date(currentDate.getTime());
                             currentDate.setMonth(currentDate.getMonth() + template.intervalValue);
@@ -755,6 +758,15 @@
             const getIntervalDescription = (template) => {
                 if (template.intervalType === 'monthDay') {
                     return 'Monthly on day ' + template.monthDay;
+                }
+                if (template.intervalType === 'weeks') {
+                    return template.intervalValue === 1 ? 'Every week' : 'Every ' + template.intervalValue + ' weeks';
+                }
+                if (template.intervalType === 'days') {
+                    return template.intervalValue === 1 ? 'Every day' : 'Every ' + template.intervalValue + ' days';
+                }
+                if (template.intervalType === 'months') {
+                    return template.intervalValue === 1 ? 'Every month' : 'Every ' + template.intervalValue + ' months';
                 }
                 return 'Every ' + template.intervalValue + ' ' + template.intervalType;
             };
@@ -1073,6 +1085,7 @@
                                         <label className="text-xs text-slate-400 mb-1 px-1">Repeats</label>
                                         <select value={newRecurring.intervalType} onChange={(e) => setNewRecurring({...newRecurring, intervalType: e.target.value})} className="border rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white text-sm">
                                             <option value="days">Every X Days</option>
+                                            <option value="weeks">Every X Weeks</option>
                                             <option value="months">Every X Months</option>
                                             <option value="monthDay">Monthly on Day</option>
                                         </select>
@@ -1117,6 +1130,7 @@
                                                             </select>
                                                             <select value={editingTemplate.intervalType} onChange={(e) => setEditingTemplate({...editingTemplate, intervalType: e.target.value})} className="border rounded px-2 py-1 text-sm bg-white">
                                                                 <option value="days">Every X Days</option>
+                                                                <option value="weeks">Every X Weeks</option>
                                                                 <option value="months">Every X Months</option>
                                                                 <option value="monthDay">Monthly on Day</option>
                                                             </select>
