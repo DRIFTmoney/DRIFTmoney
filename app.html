@@ -994,7 +994,7 @@
                                 </div>
                                 <div className="flex items-center border-b-2 border-blue-500">
                                     <span className={'text-2xl font-bold ' + (isDemo ? 'text-slate-400' : 'text-slate-800')}>$</span>
-                                    <input type="text" inputMode="decimal" value={balanceFocused ? balanceRawInput : activeStartingBalance.toFixed(2)} onFocus={() => { setBalanceFocused(true); setBalanceRawInput(String(activeStartingBalance)); }} onBlur={() => { setBalanceFocused(false); if (!isDemo) setStartingBalance(parseFloat(balanceRawInput) || 0); }} onChange={(e) => { if (!isDemo) setBalanceRawInput(e.target.value); }} onKeyDown={(e) => { if (e.key === 'Enter') { e.target.blur(); } }} readOnly={isDemo} className={'text-2xl font-bold text-slate-800 w-full focus:outline-none ' + (isDemo ? 'text-slate-400 cursor-not-allowed' : '')} placeholder="0.00" />
+                                    <input type="text" inputMode="decimal" value={balanceFocused ? balanceRawInput : fmt(activeStartingBalance)} onFocus={() => { setBalanceFocused(true); setBalanceRawInput(String(activeStartingBalance)); }} onBlur={() => { setBalanceFocused(false); if (!isDemo) setStartingBalance(parseFloat(balanceRawInput.replace(/[^0-9.]/g, "")) || 0); }} onChange={(e) => { if (!isDemo) setBalanceRawInput(e.target.value.replace(/[^0-9.]/g, "")); }} onKeyDown={(e) => { if (e.key === 'Enter') { e.target.blur(); } }} readOnly={isDemo} className={'text-2xl font-bold text-slate-800 w-full focus:outline-none ' + (isDemo ? 'text-slate-400 cursor-not-allowed' : '')} placeholder="0.00" />
                                 </div>
                                 {isDemo && <div className="absolute left-0 top-full mt-1 w-56 bg-slate-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">Switch to 'My Data' to set up your accounts</div>}
                             </div>
@@ -1068,7 +1068,7 @@
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-xs text-slate-400 mb-1 px-1">Start date</label>
-                                        <input type="date" value={newRecurring.startDate} onChange={(e) => setNewRecurring({...newRecurring, startDate: e.target.value})} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                                        <input type="date" value={newRecurring.startDate} onChange={(e) => { const d = e.target.value; const updates = { startDate: d }; if (newRecurring.intervalType === 'monthDay' && d) updates.monthDay = parseInt(d.split('-')[2]); setNewRecurring({...newRecurring, ...updates}); }} className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none" />
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-xs text-slate-400 mb-1 px-1">End date <span className="text-slate-300">(optional)</span></label>
@@ -1083,7 +1083,7 @@
                                     </div>
                                     <div className="flex flex-col">
                                         <label className="text-xs text-slate-400 mb-1 px-1">Repeats</label>
-                                        <select value={newRecurring.intervalType} onChange={(e) => setNewRecurring({...newRecurring, intervalType: e.target.value})} className="border rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white text-sm">
+                                        <select value={newRecurring.intervalType} onChange={(e) => { const t = e.target.value; const updates = { intervalType: t }; if (t === 'monthDay' && newRecurring.startDate) updates.monthDay = parseInt(newRecurring.startDate.split('-')[2]); setNewRecurring({...newRecurring, ...updates}); }} className="border rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white text-sm">
                                             <option value="days">Every X Days</option>
                                             <option value="weeks">Every X Weeks</option>
                                             <option value="months">Every X Months</option>
