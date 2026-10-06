@@ -14,6 +14,8 @@
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
+    /* Black-and-white checkboxes: black fill + white check when checked, white when unchecked */
+    input[type=checkbox] { accent-color: #000; }
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FY387MYW4Q"></script>
@@ -44,6 +46,11 @@
          *   - transactions: one-time events (past or future)
          *   - balanceOverrides: manual corrections to the running balance on a specific date
          *   - startingBalance: the user's known account balance as of a reference date
+         *   - On/off toggles (what-if checks; missing fields mean "on", so no migration needed):
+         *       recurringTemplates[].active === false  → whole series off (struck + dimmed)
+         *       recurringTemplates[].skippedDates      → single occurrences off (YYYY-MM-DD, struck)
+         *       transactions[].active === false        → one-time item off (struck)
+         *     Excluded items stay visible in the timeline but never change the running balance or totals.
          *
          * Forecast engine (generateForecast):
          *   Walks forward day-by-day from today, applying recurring transactions and one-time
@@ -165,6 +172,25 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="18 15 12 9 6 15"></polyline>
             </svg>
+        );
+
+        const Power = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+        );
+
+        // Series on/off control — "on" means every occurrence counts
+        const PowerToggle = ({ on, onClick, disabled }) => (
+            <button
+                onClick={onClick}
+                disabled={disabled}
+                title={disabled ? "Switch to 'My Data' to toggle transactions" : (on ? 'Turn off all occurrences' : 'Turn on all occurrences')}
+                className={'flex-shrink-0 transition ' + (disabled ? 'cursor-not-allowed opacity-50 ' : '') + (on ? 'text-purple-600 hover:text-purple-800' : 'text-slate-300 hover:text-slate-500')}
+            >
+                <Power />
+            </button>
         );
 
         // Helper function to parse date string as local date (avoiding UTC timezone issues)
@@ -556,6 +582,34 @@
                 setEditingTemplate(null);
             };
 
+            // Series on/off: missing `active` means on
+            const toggleSeries = (templateId) => {
+                if (isDemo) return;
+                setRecurringTemplates(recurringTemplates.map(t =>
+                    t.id === templateId ? { ...t, active: t.active === false } : t
+                ));
+            };
+
+            // Single occurrence on/off. Recurring skips live on the template so they
+            // survive the series being switched off and back on.
+            const toggleInstance = (item) => {
+                if (isDemo) return;
+                if (item.isRecurring) {
+                    setRecurringTemplates(recurringTemplates.map(t => {
+                        if (t.id !== item.templateId) return t;
+                        const skipped = t.skippedDates || [];
+                        const next = skipped.includes(item.date)
+                            ? skipped.filter(d => d !== item.date)
+                            : [...skipped, item.date];
+                        return { ...t, skippedDates: next };
+                    }));
+                } else {
+                    setTransactions(transactions.map(t =>
+                        t.id === item.id ? { ...t, active: t.active === false } : t
+                    ));
+                }
+            };
+
             const generateRecurringTransactions = () => {
                 const generated = [];
                 const endDate = new Date();
@@ -662,7 +716,15 @@
             };
 
             const balanceData = useMemo(() => {
-                const allTransactions = [...activeTransactions, ...generateRecurringTransactions()];
+                const templateById = {};
+                activeRecurringTemplates.forEach(t => { templateById[t.id] = t; });
+                const allTransactions = [
+                    ...activeTransactions.map(t => ({ ...t, seriesOff: false, instanceSkipped: t.active === false })),
+                    ...generateRecurringTransactions().map(t => {
+                        const tpl = templateById[t.templateId] || {};
+                        return { ...t, seriesOff: tpl.active === false, instanceSkipped: (tpl.skippedDates || []).includes(t.date) };
+                    })
+                ].map(t => ({ ...t, excluded: t.seriesOff || t.instanceSkipped }));
                 const sameDayOrder = (t) => {
                     if (t.isOverride) return 3;
                     if (t.isRecurring && t.type === 'expense') return 0;
@@ -678,6 +740,7 @@
                 });
                 let balance = activeStartingBalance;
                 return sorted.map(t => {
+                    if (t.excluded) return { ...t, runningBalance: balance };
                     if (t.isOverride) {
                         balance = t.overrideBalance;
                     } else if (t.type === 'income') {
@@ -725,8 +788,8 @@
             const { totalIncome, totalExpenses } = useMemo(() => {
                 const displayData = filterCutoff ? filteredData : balanceData;
                 return {
-                    totalIncome: displayData.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
-                    totalExpenses: displayData.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
+                    totalIncome: displayData.filter(t => !t.excluded && t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
+                    totalExpenses: displayData.filter(t => !t.excluded && t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
                 };
             }, [balanceData, filteredData, filterCutoff]);
 
@@ -754,8 +817,8 @@
                             ? priorItems[priorItems.length - 1].runningBalance
                             : activeStartingBalance;
                         const endingBal = items[items.length - 1].runningBalance;
-                        const monthIncome = items.filter(i => i.type === 'income').reduce((s, i) => s + i.amount, 0);
-                        const monthExpenses = items.filter(i => i.type === 'expense').reduce((s, i) => s + i.amount, 0);
+                        const monthIncome = items.filter(i => !i.excluded && i.type === 'income').reduce((s, i) => s + i.amount, 0);
+                        const monthExpenses = items.filter(i => !i.excluded && i.type === 'expense').reduce((s, i) => s + i.amount, 0);
                         const net = endingBal - openingBalance;
                         const label = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                         return { key, label, monthIncome, monthExpenses, net, endingBal, items };
@@ -793,6 +856,15 @@
                 return 'bg-red-50 border-red-500';
             };
             
+            // Strikethrough = excluded from the math; dimmed = whole series is off
+            const excludedText = (item) => (item.excluded ? ' line-through' : '') + (item.seriesOff ? ' opacity-40' : '');
+            const templateOffText = (template) => (template.active === false ? ' line-through opacity-40' : '');
+            const instanceToggleTitle = (item) => {
+                if (isDemo) return "Switch to 'My Data' to toggle transactions";
+                if (item.seriesOff) return 'All occurrences are off — turn them back on with the power button';
+                return item.instanceSkipped ? 'Include this occurrence' : 'Skip this occurrence';
+            };
+
             const getAmountColor = (item) => {
                 if (item.isOverride) return 'text-yellow-600';
                 if (item.type === 'income') return 'text-green-600';
@@ -1129,7 +1201,7 @@
                             
                             {activeRecurringTemplates.length > 0 && (
                                 <div className="mt-4 space-y-2">
-                                    <h3 className="font-semibold text-slate-700 text-sm">Active Recurring Transactions:</h3>
+                                    <h3 className="font-semibold text-slate-700 text-sm">Recurring Transactions:</h3>
                                     {activeRecurringTemplates.map(template => (
                                         <div key={template.id}>
                                             {editingTemplate && editingTemplate.id === template.id ? (
@@ -1169,13 +1241,17 @@
                                             ) : (
                                                 <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
                                                     <div className="flex items-center gap-3 flex-wrap">
-                                                        <Repeat />
-                                                        <span className="font-medium text-slate-800">{template.name}</span>
-                                                        <span className={'font-semibold ' + (template.type === 'income' ? 'text-green-600' : 'text-red-600')}>
+                                                        <PowerToggle on={template.active !== false} onClick={() => toggleSeries(template.id)} disabled={isDemo} />
+                                                        <span className={'flex' + (template.active === false ? ' opacity-40' : '')}><Repeat /></span>
+                                                        <span className={'font-medium text-slate-800' + templateOffText(template)}>{template.name}</span>
+                                                        <span className={'font-semibold ' + (template.type === 'income' ? 'text-green-600' : 'text-red-600') + templateOffText(template)}>
                                                             {template.type === 'income' ? '+' : '-'}${fmt(template.amount)}
                                                         </span>
-                                                        <span className="text-sm text-slate-600">{getIntervalDescription(template)}</span>
-                                                        <span className="text-xs text-slate-500">(starts {parseLocalDate(template.startDate).toLocaleDateString()}{template.endDate ? ' · ends ' + parseLocalDate(template.endDate).toLocaleDateString() : ''})</span>
+                                                        <span className={'text-sm text-slate-600' + templateOffText(template)}>{getIntervalDescription(template)}</span>
+                                                        <span className={'text-xs text-slate-500' + templateOffText(template)}>(starts {parseLocalDate(template.startDate).toLocaleDateString()}{template.endDate ? ' · ends ' + parseLocalDate(template.endDate).toLocaleDateString() : ''})</span>
+                                                        {(template.skippedDates || []).length > 0 && (
+                                                            <span className="text-xs text-slate-400">· {template.skippedDates.length} skipped</span>
+                                                        )}
                                                     </div>
                                                     <div className="flex gap-2">
                                                         <button onClick={() => startEditTemplate(template)} className="text-slate-400 hover:text-blue-500 transition" title="Edit">
@@ -1351,7 +1427,7 @@
                                                                     onClick={() => toggleMonth(row.key)}
                                                                     className="flex items-center gap-2 text-left hover:opacity-70 transition"
                                                                 >
-                                                                    <span className="text-slate-500 text-xs select-none" style={{display:'inline-block', transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition:'transform 0.15s'}}>▶</span>
+                                                                    <span className="text-black select-none" style={{display:'inline-flex', transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition:'transform 0.15s'}}><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><polygon points="2,1 9,5 2,9" fill="currentColor" /></svg></span>
                                                                     <span className="font-semibold text-slate-800 text-base">{row.label}</span>
                                                                     <span className="text-xs text-slate-400">({row.items.length} transaction{row.items.length !== 1 ? 's' : ''})</span>
                                                                 </button>
@@ -1382,29 +1458,42 @@
                                                         {isExpanded && (
                                                             <div className="border-t border-slate-200 bg-white divide-y divide-slate-100">
                                                                 {row.items.map(item => (
-                                                                    <div key={item.id} className={'px-3 py-2 border-l-4 ' + (item.isOverride ? 'border-yellow-400 bg-yellow-50' : item.type === 'income' ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50') + (item.isRecurring ? ' opacity-75' : '')}>
+                                                                    <div key={item.id} className={'px-3 py-2 border-l-4 ' + (item.isOverride ? 'border-yellow-400 bg-yellow-50' : item.type === 'income' ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50') + (item.isRecurring && !item.seriesOff ? ' opacity-75' : '')}>
                                                                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                                                                             <div className="flex items-center gap-3 flex-wrap">
-                                                                                <div className="text-sm text-slate-600 font-medium">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    checked={!item.instanceSkipped}
+                                                                                    onChange={() => toggleInstance(item)}
+                                                                                    disabled={isDemo || item.seriesOff}
+                                                                                    title={instanceToggleTitle(item)}
+                                                                                    className={'rounded flex-shrink-0 ' + (isDemo || item.seriesOff ? 'cursor-not-allowed opacity-40' : 'cursor-pointer')}
+                                                                                />
+                                                                                <div className={'text-sm text-slate-600 font-medium' + excludedText(item)}>
                                                                                     {parseLocalDate(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
-                                                                                    {item.isRecurring && <Repeat />}
-                                                                                    <div className="font-semibold text-slate-800">{item.name}</div>
+                                                                                    {item.isRecurring && <PowerToggle on={!item.seriesOff} onClick={() => toggleSeries(item.templateId)} disabled={isDemo} />}
+                                                                                    {item.isRecurring && <span className={'flex' + (item.seriesOff ? ' opacity-40' : '')}><Repeat /></span>}
+                                                                                    <div className={'font-semibold text-slate-800' + excludedText(item)}>{item.name}</div>
                                                                                 </div>
                                                                             </div>
                                                                             <div className="flex items-center justify-end gap-4 ml-auto">
-                                                                                <div className="text-right min-w-24">
+                                                                                <div className={'text-right min-w-24' + (item.seriesOff ? ' opacity-40' : '')}>
                                                                                     <div className="text-xs text-slate-500">Amount</div>
-                                                                                    <div className={'font-bold text-lg whitespace-nowrap ' + getAmountColor(item)}>
+                                                                                    <div className={'font-bold text-lg whitespace-nowrap ' + getAmountColor(item) + (item.excluded ? ' line-through' : '')}>
                                                                                         {formatAmount(item)}
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="text-right min-w-28">
                                                                                     <div className="text-xs text-slate-500">Balance</div>
-                                                                                    <div className={'font-bold text-lg whitespace-nowrap ' + (item.runningBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
-                                                                                        ${fmt(item.runningBalance)}
-                                                                                    </div>
+                                                                                    {item.excluded ? (
+                                                                                        <div className="font-bold text-lg whitespace-nowrap text-slate-300">—</div>
+                                                                                    ) : (
+                                                                                        <div className={'font-bold text-lg whitespace-nowrap ' + (item.runningBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
+                                                                                            ${fmt(item.runningBalance)}
+                                                                                        </div>
+                                                                                    )}
                                                                                 </div>
                                                                                 <div className="w-12 flex-shrink-0"></div>
                                                                             </div>
@@ -1463,29 +1552,42 @@
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className={'p-3 rounded-lg border-l-4 ' + getTransactionColor(item) + (item.isRecurring ? ' opacity-75' : '') + (idx === lastPastIndex ? ' ring-4 ring-blue-500' : '')}>
+                                                <div className={'p-3 rounded-lg border-l-4 ' + getTransactionColor(item) + (item.isRecurring && !item.seriesOff ? ' opacity-75' : '') + (idx === lastPastIndex ? ' ring-4 ring-blue-500' : '')}>
                                                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
                                                         <div className="flex items-center gap-3 flex-wrap">
-                                                            <div className="text-sm text-slate-600 font-medium">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!item.instanceSkipped}
+                                                                onChange={() => toggleInstance(item)}
+                                                                disabled={isDemo || item.seriesOff}
+                                                                title={instanceToggleTitle(item)}
+                                                                className={'rounded flex-shrink-0 ' + (isDemo || item.seriesOff ? 'cursor-not-allowed opacity-40' : 'cursor-pointer')}
+                                                            />
+                                                            <div className={'text-sm text-slate-600 font-medium' + excludedText(item)}>
                                                                 {parseLocalDate(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                             </div>
                                                             <div className="flex items-center gap-2">
-                                                                {item.isRecurring && <Repeat />}
-                                                                <div className="font-semibold text-slate-800">{item.name}</div>
+                                                                {item.isRecurring && <PowerToggle on={!item.seriesOff} onClick={() => toggleSeries(item.templateId)} disabled={isDemo} />}
+                                                                {item.isRecurring && <span className={'flex' + (item.seriesOff ? ' opacity-40' : '')}><Repeat /></span>}
+                                                                <div className={'font-semibold text-slate-800' + excludedText(item)}>{item.name}</div>
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center justify-end gap-4 ml-auto">
-                                                            <div className="text-right min-w-24">
+                                                            <div className={'text-right min-w-24' + (item.seriesOff ? ' opacity-40' : '')}>
                                                                 <div className="text-xs text-slate-500">Amount</div>
-                                                                <div className={'font-bold text-lg whitespace-nowrap ' + getAmountColor(item)}>
+                                                                <div className={'font-bold text-lg whitespace-nowrap ' + getAmountColor(item) + (item.excluded ? ' line-through' : '')}>
                                                                     {formatAmount(item)}
                                                                 </div>
                                                             </div>
                                                             <div className="text-right min-w-28">
                                                                 <div className="text-xs text-slate-500">Balance</div>
-                                                                <div className={'font-bold text-lg whitespace-nowrap ' + (item.runningBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
-                                                                    ${fmt(item.runningBalance)}
-                                                                </div>
+                                                                {item.excluded ? (
+                                                                    <div className="font-bold text-lg whitespace-nowrap text-slate-300">—</div>
+                                                                ) : (
+                                                                    <div className={'font-bold text-lg whitespace-nowrap ' + (item.runningBalance < 0 ? 'text-red-600' : 'text-slate-800')}>
+                                                                        ${fmt(item.runningBalance)}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                             {!item.isRecurring ? (
                                                                 <div className="flex gap-2">
